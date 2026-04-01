@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui"
+          onLoad="OnRibbonLoad">
+  <ribbon>
+    <tabs>
+      <tab id="tabFinanceFmt" label="Finance Fmt">
+
+        <!-- ═══ GRUPO: NUMÉRICO ══════════════════════════════════════════ -->
+        <group id="grpNumeric" label="Numérico">
+
+          <button id="btnFin8D"
+                  label="Fin 8D"
+                  screentip="Formato financeiro — 8 decimais"
+                  supertip="Aplica formato contábil com separador de milhar e 8 casas decimais. Ideal para taxas e preços unitários."
+                  size="normal"
+                  imageMso="AccountingNumberFormat"
+                  onAction="RibbonFin8D"/>
+
+          <button id="btnFin4D"
+                  label="Fin 4D"
+                  screentip="Formato financeiro — 4 decimais"
+                  supertip="Formato contábil com 4 casas. Útil para spreads e taxas resumidas."
+                  size="normal"
+                  imageMso="AccountingNumberFormat"
+                  onAction="RibbonFin4D"/>
+
+          <button id="btnFin2D"
+                  label="Fin 2D"
+                  screentip="Formato financeiro — 2 decimais"
+                  supertip="Formato contábil com 2 casas decimais."
+                  size="normal"
+                  imageMso="AccountingNumberFormat"
+                  onAction="RibbonFin2D"/>
+
+          <button id="btnInteger"
+                  label="Fin 0D"
+                  screentip="Formato financeiro — 0 decimais"
+                  supertip="Formato contábil sem casas decimais, alinhado com Fin 8D / 4D / 2D. Negativos entre parênteses. Respeita as opções de alinhamento forçado e zero contábil."
+                  size="normal"
+                  imageMso="AccountingNumberFormat"
+                  onAction="RibbonInteger"/>
+
+          <separator id="sep1"/>
+
+          <checkBox id="chkForceAlign"
+                    label="Forçar à direita"
+                    screentip="Preencher espaço à esquerda com espaços"
+                    supertip="Quando marcado, insere o caractere * no formato numérico, fazendo o Excel preencher o espaço restante da célula com espaços e alinhando os dígitos à direita. Afeta Fin 0D / 2D / 4D / 8D."
+                    onAction="RibbonChkForceAlign"
+                    getPressed="RibbonGetForceAlign"/>
+
+          <checkBox id="chkZeroDash"
+                    label="Zero contábil (&quot;-&quot;)"
+                    screentip="Exibir zero como traço"
+                    supertip="Quando marcado, células com valor exatamente igual a zero exibem &quot;-&quot; alinhado à coluna, em vez de 0,0000... Afeta apenas Fin 0D / 2D / 4D / 8D."
+                    onAction="RibbonChkZeroDash"
+                    getPressed="RibbonGetZeroDash"/>
+
+        </group>
+
+        <!-- ═══ GRUPO: PERCENTUAL ════════════════════════════════════════ -->
+        <group id="grpPercent" label="Percentual">
+
+          <button id="btnPct4D"
+                  label="% 4D"
+                  screentip="Percentual — 4 decimais"
+                  supertip="Exibe o valor multiplicado por 100 com 4 casas decimais e símbolo %."
+                  size="normal"
+                  imageMso="PercentStyle"
+                  onAction="RibbonPct4D"/>
+
+          <button id="btnPct2D"
+                  label="% 2D"
+                  screentip="Percentual — 2 decimais"
+                  supertip="Exibe o valor multiplicado por 100 com 2 casas decimais e símbolo %."
+                  size="normal"
+                  imageMso="PercentStyle"
+                  onAction="RibbonPct2D"/>
+
+          <button id="btnSpread"
+                  label="Spread bps"
+                  screentip="Spread em pontos-base"
+                  supertip="Exibe o valor como spread em bps com 1 decimal (ex.: 125,0 bps)."
+                  size="normal"
+                  imageMso="ChartLine"
+                  onAction="RibbonSpreadBps"/>
+
+        </group>
+
+        <!-- ═══ GRUPO: DATA ══════════════════════════════════════════════ -->
+        <group id="grpDates" label="Data">
+
+          <button id="btnDateISO"
+                  label="ISO"
+                  screentip="Data ISO 8601 (yyyy-mm-dd)"
+                  supertip="Formata datas no padrão internacional ISO 8601. Recomendado para exportações e sistemas."
+                  size="normal"
+                  imageMso="TableInsertDate"
+                  onAction="RibbonDateISO"/>
+
+          <button id="btnDateBR"
+                  label="BR"
+                  screentip="Data brasileira (dd/mm/yyyy)"
+                  supertip="Formata datas em pt-BR com mês abreviado em português."
+                  size="normal"
+                  imageMso="DateAndTimeInsert"
+                  onAction="RibbonDateBR"/>
+
+          <button id="btnDateBRLong"
+                  label="BR Extenso"
+                  screentip="Data por extenso em português"
+                  supertip="Ex.: 15 de março de 2025"
+                  size="normal"
+                  imageMso="DateAndTimeInsert"
+                  onAction="RibbonDateBRLong"/>
+
+        </group>
+
+        <!-- ═══ GRUPO: TEXTO ═════════════════════════════════════════════ -->
+        <group id="grpText" label="Texto">
+
+          <button id="btnText"
+                  label="Texto"
+                  screentip="Força formato Texto"
+                  supertip="Útil para CEPs, CNPJs, códigos CETIP e outros identificadores que não devem ser interpretados como número."
+                  size="normal"
+                  imageMso="TextBox"
+                  onAction="RibbonText"/>
+
+        </group>
+
+        <!-- ═══ GRUPO: INFO ══════════════════════════════════════════════ -->
+        <group id="grpInfo" label="Info">
+
+          <button id="btnFinInfo"
+                  label="Documentação"
+                  screentip="Referência dos formatos Fin"
+                  supertip="Abre a página da documentação detalhada dos formatos Fin 0D / 2D / 4D / 8D, exemplos de valores e as strings de formato ativas."
+                  size="normal"
+                  imageMso="TablePropertiesDialog"
+                  onAction="RibbonFinInfo"/>
+
+          <button id="btnAbout"
+                  label="Sobre"
+                  screentip="Versão e informações do add-in"
+                  size="normal"
+                  imageMso="Info"
+                  onAction="RibbonAbout"/>
+
+        </group>
+
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>
