@@ -101,7 +101,7 @@ End Sub
 ' -- Info ---------------------------------------------------------------------
 
 Public Sub RibbonFinInfo(control As IRibbonControl)
-    ShowFinInfo
+    OpenDocsURL
 End Sub
 
 Public Sub RibbonAbout(control As IRibbonControl)

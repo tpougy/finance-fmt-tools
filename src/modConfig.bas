@@ -4,6 +4,7 @@ Option Explicit
 Public Const CFG_ADDIN_NAME      As String = "Finance Fmt Tools"
 Public Const CFG_ADDIN_VERSION   As String = "1.3.0"
 Public Const CFG_RIBBON_TAB_ID   As String = "tabFinanceFmt"
+Public Const CFG_DOCS_URL As String = "https://github.com/tpougy/finance-fmt-tools"
 
 ' -- Logging ------------------------------------------------------------------
 Public Const CFG_LOG_ENABLED     As Boolean = True
@@ -26,4 +27,3 @@ Public Const FMT_DATE_BR         As String = "DATE_BR"
 Public Const FMT_DATE_BR_LONG    As String = "DATE_BR_LONG"
 Public Const FMT_TEXT            As String = "TEXT"
 Public Const FMT_INTEGER         As String = "INTEGER"
-

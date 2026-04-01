@@ -244,4 +244,16 @@ Private Function FindChildNode(ByVal part As CustomXMLPart, _
     Next child
 End Function
 
+' -- Documentação online ------------------------------------------------------
 
+Public Sub OpenDocsURL()
+    Const PROC As String = "OpenDocsURL"
+    On Error GoTo ErrHandler
+
+    ThisWorkbook.FollowHyperlink CFG_DOCS_URL, NewWindow:=True
+    Log PROC & ": abriu " & CFG_DOCS_URL
+    Exit Sub
+
+ErrHandler:
+    HandleError PROC, Err
+End Sub
