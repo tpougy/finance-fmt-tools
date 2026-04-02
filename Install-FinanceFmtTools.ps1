@@ -43,6 +43,11 @@ $CFG.TempPath     = Join-Path $env:TEMP $CFG.AddinFilename
 $CFG.OfficeAddins = Join-Path $env:APPDATA 'Microsoft\AddIns'
 $CFG.DestPath     = Join-Path $CFG.OfficeAddins $CFG.AddinFilename
 
+# Força TLS 1.2 globalmente — PS 5.1 no Windows usa TLS 1.0 por padrão,
+# que é rejeitado pelo GitHub desde 2018. Deve ficar aqui, antes de
+# qualquer chamada de rede (Invoke-RestMethod, HttpWebRequest, etc.)
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+
 
 # =============================================================================
 # HELPERS
@@ -147,9 +152,6 @@ function Get-FileFromWeb {
         }
     }
     Process {
-        # Força TLS 1.2 — obrigatório para GitHub (padrão do PS pode ser TLS 1.0/1.1)
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-
         $reader = $null
         $writer = $null
 
