@@ -121,14 +121,17 @@ Public Sub LoadConfig()
     Set part = FindOrCreateXMLPart()
 
     CFG_FORCE_ALIGN = ReadBoolNode(part, "ForceAlign", defaultVal:=True)
-    CFG_ZERO_DASH = ReadBoolNode(part, "ZeroDash", defaultVal:=False)
+    CFG_ZERO_DASH   = ReadBoolNode(part, "ZeroDash",   defaultVal:=False)
 
-    Log PROC & ": ForceAlign=" & CFG_FORCE_ALIGN & " | ZeroDash=" & CFG_ZERO_DASH
+    Log PROC & ": ForceAlign=" & CFG_FORCE_ALIGN & _
+               " | ZeroDash=" & CFG_ZERO_DASH & _
+               " | fonte=CustomXMLPart"
     Exit Sub
 
 ErrHandler:
-    CFG_FORCE_ALIGN = True    ' fallback seguro
-    CFG_ZERO_DASH = False
+    CFG_FORCE_ALIGN = True
+    CFG_ZERO_DASH   = False
+    Log PROC & ": ERRO na leitura — aplicando defaults | ForceAlign=True | ZeroDash=False | fonte=fallback"
     HandleError PROC, Err
 End Sub
 
@@ -142,12 +145,23 @@ Public Sub SaveConfig()
     Set part = FindOrCreateXMLPart()
 
     WriteBoolNode part, "ForceAlign", CFG_FORCE_ALIGN
-    WriteBoolNode part, "ZeroDash", CFG_ZERO_DASH
+    WriteBoolNode part, "ZeroDash",   CFG_ZERO_DASH
 
-    Log PROC & ": configuração salva"
+    ' Persiste em disco — sem este Save, as alterações no CustomXMLPart
+    ' ficam apenas em memória e são perdidas quando o Excel fecha.
+    Application.EnableEvents = False
+    ThisWorkbook.Save
+    Application.EnableEvents = True
+
+    Log PROC & ": ForceAlign=" & CFG_FORCE_ALIGN & _
+               " | ZeroDash=" & CFG_ZERO_DASH & _
+               " | .xlam gravado em disco"
     Exit Sub
 
 ErrHandler:
+    Application.EnableEvents = True   ' reativa mesmo em erro
+    Log PROC & ": ERRO ao salvar | ForceAlign=" & CFG_FORCE_ALIGN & _
+               " | ZeroDash=" & CFG_ZERO_DASH
     HandleError PROC, Err
 End Sub
 
