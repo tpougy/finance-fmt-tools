@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Instala ou atualiza o add-in RBR Finance Tools no Excel.
+    Instala ou atualiza o add-in Finance Fmt Tools no Excel.
 
 .DESCRIPTION
     Baixa a versão mais recente do GitHub Releases e instala/atualiza
@@ -13,11 +13,11 @@
 
 .EXAMPLE
     # Execução direta (uma linha no PowerShell):
-    Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/Install-RBRFinanceTools.ps1 | iex
+    Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/Install-FinanceFmtTools.ps1 | iex
 
 .EXAMPLE
     # Execução local com flag de reinstalação forçada:
-    .\Install-RBRFinanceTools.ps1 -Force
+    .\Install-FinanceFmtTools.ps1 -Force
 #>
 
 [CmdletBinding()]
@@ -33,7 +33,7 @@ $ErrorActionPreference = 'Stop'
 # =============================================================================
 $CFG = @{
     AddinTitle    = 'Finance Fmt Tools'                   # Deve bater com o Title do .xlam (File > Info > Properties > Title)
-    AddinFilename = 'FinanceFmtTools.xlam'              # Nome fixo do asset no GitHub Release
+    AddinFilename = 'FinanceFmtTools.xlam'                # Nome fixo do asset no GitHub Release
     GithubOwner   = 'tpougy'
     GithubRepo    = 'finance-fmt-tools'
 }
@@ -93,7 +93,7 @@ function Get-LatestReleaseTag {
     # Consulta a API do GitHub para obter a tag da versão mais recente
     $apiUrl = "https://api.github.com/repos/$($CFG.GithubOwner)/$($CFG.GithubRepo)/releases/latest"
     try {
-        $release = Invoke-RestMethod -Uri $apiUrl -Headers @{ 'User-Agent' = 'RBR-Install' } -ErrorAction Stop
+        $release = Invoke-RestMethod -Uri $apiUrl -Headers @{ 'User-Agent' = 'FinanceFmtTools-Install' } -ErrorAction Stop
         return $release.tag_name
     } catch {
         return '(desconhecida)'
@@ -147,11 +147,18 @@ function Get-FileFromWeb {
         }
     }
     Process {
+        # Força TLS 1.2 — obrigatório para GitHub (padrão do PS pode ser TLS 1.0/1.1)
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+
+        $reader = $null
+        $writer = $null
+
         try {
             $storeEAP = $ErrorActionPreference
             $ErrorActionPreference = 'Stop'
 
-            $request  = [System.Net.HttpWebRequest]::Create($URL)
+            $request = [System.Net.HttpWebRequest]::Create($URL)
+            $request.AllowAutoRedirect = $true   # segue o redirect 302 do GitHub CDN
             $response = $request.GetResponse()
 
             if ($response.StatusCode -eq 401 -or $response.StatusCode -eq 403 -or $response.StatusCode -eq 404) {
@@ -201,6 +208,7 @@ function Get-FileFromWeb {
         catch {
             $ExeptionMsg = $_.Exception.Message
             Write-Host "Download breaks with error : $ExeptionMsg"
+            throw   # repropaga para Invoke-Download detectar a falha
         }
         finally {
             if ($reader) { $reader.Close() }
@@ -333,7 +341,7 @@ function Invoke-Cleanup {
 
 Write-Host ''
 Write-Host '======================================================' -ForegroundColor White
-Write-Host "  RBR Finance Tools — Instalador"                       -ForegroundColor White
+Write-Host "  Finance Fmt Tools — Instalador"                      -ForegroundColor White
 Write-Host '======================================================' -ForegroundColor White
 Write-Host ''
 
@@ -361,4 +369,3 @@ try {
     Write-Host ''
     exit 1
 }
-
