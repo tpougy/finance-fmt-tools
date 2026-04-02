@@ -4,19 +4,19 @@
     Instala ou atualiza o add-in Finance Fmt Tools no Excel.
 
 .DESCRIPTION
-    Baixa a versão mais recente do GitHub Releases e instala/atualiza
-    o add-in no Excel. Detecta automaticamente se é uma instalação nova
-    ou atualização de versão existente.
+    Baixa a versao mais recente do GitHub Releases e instala/atualiza
+    o add-in no Excel. Detecta automaticamente se e uma instalacao nova
+    ou atualizacao de versao existente.
 
 .PARAMETER Force
-    Reinstala mesmo que o arquivo instalado pareça idêntico ao disponível.
+    Reinstala mesmo que o arquivo instalado pareca identico ao disponivel.
 
 .EXAMPLE
-    # Execução direta (uma linha no PowerShell):
+    # Execucao direta (uma linha no PowerShell):
     Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/Install-FinanceFmtTools.ps1 | iex
 
 .EXAMPLE
-    # Execução local com flag de reinstalação forçada:
+    # Execucao local com flag de reinstalacao forcada:
     .\Install-FinanceFmtTools.ps1 -Force
 #>
 
@@ -29,7 +29,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 # =============================================================================
-# CONFIGURAÇÃO — ajuste se o repositório ou nome do arquivo mudarem
+# CONFIGURACAO - ajuste se o repositorio ou nome do arquivo mudarem
 # =============================================================================
 $CFG = @{
     AddinTitle    = 'Finance Fmt Tools'                   # Deve bater com o Title do .xlam (File > Info > Properties > Title)
@@ -43,8 +43,8 @@ $CFG.TempPath     = Join-Path $env:TEMP $CFG.AddinFilename
 $CFG.OfficeAddins = Join-Path $env:APPDATA 'Microsoft\AddIns'
 $CFG.DestPath     = Join-Path $CFG.OfficeAddins $CFG.AddinFilename
 
-# Força TLS 1.2 globalmente — PS 5.1 no Windows usa TLS 1.0 por padrão,
-# que é rejeitado pelo GitHub desde 2018. Deve ficar aqui, antes de
+# Forca TLS 1.2 globalmente - PS 5.1 no Windows usa TLS 1.0 por padrao,
+# que e rejeitado pelo GitHub desde 2018. Deve ficar aqui, antes de
 # qualquer chamada de rede (Invoke-RestMethod, HttpWebRequest, etc.)
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
@@ -82,32 +82,35 @@ function Get-FileSizeKB {
 function Assert-ExcelNotRunning {
     $excelProcs = Get-Process -Name 'EXCEL' -ErrorAction SilentlyContinue
     if ($excelProcs) {
-        Write-Warn 'O Excel está aberto. Feche-o antes de instalar/atualizar o add-in.'
+        Write-Warn 'O Excel esta aberto. Feche-o antes de instalar/atualizar o add-in.'
         $answer = Read-Host '  Deseja fechar o Excel automaticamente? [S/N]'
         if ($answer -match '^[Ss]') {
             $excelProcs | Stop-Process -Force
             Start-Sleep -Seconds 2
             Write-Ok 'Excel encerrado.'
         } else {
-            throw 'Instalação cancelada. Feche o Excel e tente novamente.'
+            throw 'Instalacao cancelada. Feche o Excel e tente novamente.'
         }
     }
 }
 
 function Get-LatestReleaseTag {
-    # Consulta a API do GitHub para obter a tag da versão mais recente
     $apiUrl = "https://api.github.com/repos/$($CFG.GithubOwner)/$($CFG.GithubRepo)/releases/latest"
     try {
         $release = Invoke-RestMethod -Uri $apiUrl -Headers @{ 'User-Agent' = 'FinanceFmtTools-Install' } -ErrorAction Stop
         return $release.tag_name
     } catch {
-        return '(desconhecida)'
+        $status = $_.Exception.Response.StatusCode.value__
+        if ($status -eq 404) {
+            throw "Nenhum release encontrado em github.com/$($CFG.GithubOwner)/$($CFG.GithubRepo). Publique um release com o asset '$($CFG.AddinFilename)' antes de executar este instalador."
+        }
+        throw "Falha ao consultar GitHub Releases: $_"
     }
 }
 
 
 # =============================================================================
-# ETAPA 1 — DOWNLOAD COM BARRA DE PROGRESSO
+# ETAPA 1 - DOWNLOAD COM BARRA DE PROGRESSO
 # =============================================================================
 
 function Get-FileFromWeb {
@@ -187,7 +190,7 @@ function Get-FileFromWeb {
             $reader = $response.GetResponseStream()
             $writer = New-Object System.IO.FileStream $File, "Create"
 
-            # FIX: $File é string — usa GetFileName em vez de $File.Name (que seria FileInfo)
+            # FIX: $File e string - usa GetFileName em vez de $File.Name (que seria FileInfo)
             $fileName     = [System.IO.Path]::GetFileName($File)
             $finalBarCount = 0
 
@@ -222,11 +225,11 @@ function Get-FileFromWeb {
 }
 
 function Invoke-Download {
-    Write-Step "Consultando versão mais recente em GitHub Releases..."
+    Write-Step "Consultando versao mais recente em GitHub Releases..."
     $tag = Get-LatestReleaseTag
-    Write-Step "Versão: $tag  |  URL: $($CFG.DownloadUrl)"
+    Write-Step "Versao: $tag  |  URL: $($CFG.DownloadUrl)"
 
-    # Remove arquivo temporário anterior se existir
+    # Remove arquivo temporario anterior se existir
     if (Test-Path $CFG.TempPath) { Remove-Item $CFG.TempPath -Force }
 
     Write-Step 'Baixando...'
@@ -234,15 +237,15 @@ function Invoke-Download {
 
     Get-FileFromWeb -URL $CFG.DownloadUrl -File $CFG.TempPath
 
-    Write-Host ''   # quebra de linha após a barra inline
-    Write-Ok "Download concluído: $($CFG.TempPath)  ($(Get-FileSizeKB $CFG.TempPath) KB)"
+    Write-Host ''   # quebra de linha apos a barra inline
+    Write-Ok "Download concluido: $($CFG.TempPath)  ($(Get-FileSizeKB $CFG.TempPath) KB)"
 
     return $tag
 }
 
 
 # =============================================================================
-# ETAPA 2 — INSTALL / UPDATE VIA EXCEL COM
+# ETAPA 2 - INSTALL / UPDATE VIA EXCEL COM
 # =============================================================================
 
 function Invoke-AddinInstall {
@@ -261,15 +264,15 @@ function Invoke-AddinInstall {
     if ($destExists -and -not $Force) {
         $destSize = (Get-Item $CFG.DestPath).Length
         if ($tempSize -eq $destSize) {
-            Write-Ok "O arquivo instalado já é idêntico ao release $ReleaseTag. Nada a fazer."
+            Write-Ok "O arquivo instalado ja e identico ao release $ReleaseTag. Nada a fazer."
             Write-Warn "Use -Force para reinstalar mesmo assim."
             return
         }
-        Write-Step "Tamanho diferente (instalado: $([math]::Round($destSize/1KB))KB  /  novo: $([math]::Round($tempSize/1KB))KB) — atualizando."
+        Write-Step "Tamanho diferente (instalado: $([math]::Round($destSize/1KB))KB  /  novo: $([math]::Round($tempSize/1KB))KB) - atualizando."
     } elseif (-not $destExists) {
-        Write-Step 'Add-in não encontrado. Realizando instalação inicial.'
+        Write-Step 'Add-in nao encontrado. Realizando instalacao inicial.'
     } else {
-        Write-Step '-Force ativo — reinstalando independentemente da versão.'
+        Write-Step '-Force ativo - reinstalando independentemente da versao.'
     }
 
     # --- Copia para a pasta de add-ins ----------------------------------------
@@ -290,7 +293,7 @@ function Invoke-AddinInstall {
         # Excel.AddIns.Add() exige um workbook aberto (bug conhecido do Excel COM)
         $wb = $excel.Workbooks.Add()
 
-        # Verifica se o add-in já está registrado (cenário de atualização)
+        # Verifica se o add-in ja esta registrado (cenario de atualizacao)
         $existingAddin = $null
         for ($i = 1; $i -le $excel.AddIns.Count; $i++) {
             $ai = $excel.AddIns.Item($i)
@@ -303,7 +306,7 @@ function Invoke-AddinInstall {
 
         if ($null -ne $existingAddin) {
             # UPDATE: desinstala a entrada antiga antes de reregistrar
-            Write-Step "Add-in '$($CFG.AddinTitle)' já registrado — atualizando registro."
+            Write-Step "Add-in '$($CFG.AddinTitle)' ja registrado - atualizando registro."
             $existingAddin.Installed = $false
             [System.Runtime.InteropServices.Marshal]::ReleaseComObject($existingAddin) | Out-Null
             $existingAddin = $null
@@ -326,13 +329,13 @@ function Invoke-AddinInstall {
 
 
 # =============================================================================
-# ETAPA 3 — LIMPEZA
+# ETAPA 3 - LIMPEZA
 # =============================================================================
 
 function Invoke-Cleanup {
     if (Test-Path $CFG.TempPath) {
         Remove-Item $CFG.TempPath -Force -ErrorAction SilentlyContinue
-        Write-Step 'Arquivo temporário removido.'
+        Write-Step 'Arquivo temporario removido.'
     }
 }
 
@@ -343,7 +346,7 @@ function Invoke-Cleanup {
 
 Write-Host ''
 Write-Host '======================================================' -ForegroundColor White
-Write-Host "  Finance Fmt Tools — Instalador"                      -ForegroundColor White
+Write-Host "  Finance Fmt Tools - Instalador"                      -ForegroundColor White
 Write-Host '======================================================' -ForegroundColor White
 Write-Host ''
 
@@ -360,14 +363,14 @@ try {
 
     Write-Host ''
     Write-Host '======================================================' -ForegroundColor Green
-    Write-Host "  Instalação concluída! Abra o Excel para usar a aba" -ForegroundColor Green
+    Write-Host "  Instalacao concluida! Abra o Excel para usar a aba" -ForegroundColor Green
     Write-Host "  'Finance Fmt' no ribbon."                            -ForegroundColor Green
     Write-Host '======================================================' -ForegroundColor Green
     Write-Host ''
 
 } catch {
     Write-Host ''
-    Write-Fail "Erro durante a instalação: $_"
+    Write-Fail "Erro durante a instalacao: $_"
     Write-Host ''
     exit 1
 }
