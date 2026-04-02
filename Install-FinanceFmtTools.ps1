@@ -136,7 +136,7 @@ function Get-FileFromWeb {
             $percentComplete = $percent * 100
             if ($ValueSuffix) { $ValueSuffix = " $ValueSuffix" }
 
-            if ($psISE) {
+            if ((Test-Path variable:psISE) -and $psISE) {
                 Write-Progress "$ProgressText $CurrentValue$ValueSuffix of $TotalValue$ValueSuffix" -id 0 -percentComplete $percentComplete
             }
             else {
