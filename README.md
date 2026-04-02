@@ -2,7 +2,7 @@
 
 > Add-in Excel (.xlam) para formatação padronizada de dados financeiros em mercado de capitais.
 
-**Versão:** 1.3.0 · **Plataforma:** Excel para Windows (Office 2016+)
+**Versão:** 1.0.0 · **Plataforma:** Excel para Windows (Office 2016+)
 
 ---
 
