@@ -138,19 +138,19 @@ Public Function GetFormatDef(ByVal key As String) As FormatDef
         Case FMT_DATE_ISO
             f.key = FMT_DATE_ISO
             f.DisplayName = "Data ISO"
-            f.NumberFmt = "yyyy-mm-dd"
+            f.NumberFmt = "yyyy-mm-dd;@"
             f.Category = "date"
 
         Case FMT_DATE_BR
             f.key = FMT_DATE_BR
             f.DisplayName = "Data BR"
-            f.NumberFmt = "[$-pt-BR]dd/mm/yyyy"
+            f.NumberFmt = "[$-pt-BR]dd/mm/yyyy;@"
             f.Category = "date"
 
         Case FMT_DATE_BR_LONG
             f.key = FMT_DATE_BR_LONG
             f.DisplayName = "Data BR Longa"
-            f.NumberFmt = "[$-pt-BR]dd/mmm/yyyy"
+            f.NumberFmt = "[$-pt-BR]dd/mmm/yyyy;@"
             f.Category = "date"
 
         ' -- Texto ------------------------------------------------------------
