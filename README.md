@@ -168,7 +168,12 @@ Aplica a format string `@`, que força o Excel a tratar o conteúdo da célula c
 
 ## Instalação
 
-> 🚧 _Seção em construção._
+Execute o instalador PowerShell abaixo ou baixe o instalador .bat.
+
+```ps1
+Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/Install-FinanceFmtTools.ps1 | iex
+```
+Requisitos: Excel para Windows, Office 2016 ou superior.
 
 ---
 
