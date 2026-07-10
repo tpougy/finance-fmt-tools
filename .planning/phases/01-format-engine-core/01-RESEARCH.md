@@ -418,14 +418,14 @@ namespace FinanceFmtTools.Engine.Tests
 
 **If this table is empty:** N/A — two low-risk style assumptions are logged above; everything else in this document (package versions, build/test viability, VBA algorithm decoding, tooltip-vs-code discrepancies) was either empirically verified this session or directly read from the VBA source files.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should `FormatDef.Alignment` reuse Excel's own `XlHAlign`-style values or a Phase-1-private enum?**
+1. **RESOLVED — Should `FormatDef.Alignment` reuse Excel's own `XlHAlign`-style values or a Phase-1-private enum?**
    - What we know: Phase 1's explicit goal is "zero Excel/COM references," and `Microsoft.Office.Interop.Excel` isn't available to reference from a `net48;net8.0`-multi-targeted project without breaking the `net8.0` leg entirely (COM interop doesn't exist on non-Windows/non-Framework targets).
    - What's unclear: Nothing technical — the constraint makes the answer unambiguous. This is listed only so the planner explicitly names the private enum (e.g., `CellAlignment`) rather than accidentally deferring the decision into Phase 2 in a way that creates rework.
    - Recommendation: Define `CellAlignment { General, Left, Right }` in Phase 1 (see Recommended Project Structure); Phase 2's `IExcelGateway` implementation maps this to the real `XlHAlign` enum when it exists.
 
-2. **Should the `net8.0` leg of the class library ship as a NuGet package or stay dev/test-only?**
+2. **RESOLVED — Should the `net8.0` leg of the class library ship as a NuGet package or stay dev/test-only?**
    - What we know: CLAUDE.md and ROADMAP.md are unambiguous that the *distributed* artifact is `net48` (COM-hosted inside Excel). The `net8.0` leg's only purpose, per CONTEXT.md's discretion note, is enabling `dotnet test` on this Linux dev machine.
    - What's unclear: Nothing blocking — flagged only so the planner doesn't accidentally scope in packaging/publishing work for the `net8.0` build output, which is out of scope for this phase (and arguably any phase — Phase 5's CI/CD packages only the `net48` output per ROADMAP.md Phase 5 success criteria).
    - Recommendation: Treat `net8.0` as build/test-infrastructure only; do not add any `<Pack>`/publish steps for it.
