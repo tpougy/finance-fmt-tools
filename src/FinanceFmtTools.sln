@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceFmtTools.Engine", "FinanceFmtTools.Engine\FinanceFmtTools.Engine.csproj", "{832D6423-1850-4D44-B7A6-F85E4A1C5F36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceFmtTools.Engine.Tests", "FinanceFmtTools.Engine.Tests\FinanceFmtTools.Engine.Tests.csproj", "{D8E392DD-1696-4C42-ADFE-4AE8F6CAE144}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{832D6423-1850-4D44-B7A6-F85E4A1C5F36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{832D6423-1850-4D44-B7A6-F85E4A1C5F36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{832D6423-1850-4D44-B7A6-F85E4A1C5F36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8E392DD-1696-4C42-ADFE-4AE8F6CAE144}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8E392DD-1696-4C42-ADFE-4AE8F6CAE144}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8E392DD-1696-4C42-ADFE-4AE8F6CAE144}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8E392DD-1696-4C42-ADFE-4AE8F6CAE144}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
