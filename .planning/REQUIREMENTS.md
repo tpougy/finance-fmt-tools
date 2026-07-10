@@ -26,7 +26,7 @@ Full-parity migration from VBA to C#. No staged rollout — every requirement be
 
 ### Build & Test
 
-- [ ] **DEV-01**: O projeto compila e roda os testes 100% via `dotnet` CLI (build/test), sem exigir Visual Studio completo
+- [x] **DEV-01**: O projeto compila e roda os testes 100% via `dotnet` CLI (build/test), sem exigir Visual Studio completo
 
 ### Instalação (64-bit only)
 
@@ -84,7 +84,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RIB-02 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
 | RIB-03 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
 | RIB-04 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
-| DEV-01 | Phase 1 - Format Engine Core | Pending |
+| DEV-01 | Phase 1 - Format Engine Core | Complete |
 | INST-01 | Phase 4 - Installation & Registration | Pending |
 | INST-02 | Phase 4 - Installation & Registration | Pending |
 | INST-03 | Phase 4 - Installation & Registration | Pending |

@@ -1,11 +1,16 @@
 ---
-gsd_state_version: '1.0'
-status: planning
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: executing
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-07-10T20:49:18.983Z"
+last_activity: 2026-07-10
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 3
+  completed_plans: 1
   percent: 0
 ---
 
@@ -16,20 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Aplicar formatos financeiros/contábeis padronizados a células do Excel com um clique — agora sobre uma base de código C# testável, com dev/build/release 100% via terminal.
-**Current focus:** Phase 1 - Format Engine Core
+**Current focus:** Phase 1 — Format Engine Core
 
 ## Current Position
 
-Phase: 1 of 5 (Format Engine Core)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-07-10 — ROADMAP.md created, 20/20 v1 requirements mapped across 5 phases
+Phase: 1 (Format Engine Core) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-07-10
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: - min
 - Total execution time: 0 hours
@@ -41,10 +47,12 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: -
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01 P01 | 25 min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -55,6 +63,8 @@ Recent decisions affecting current work:
 
 - Roadmap: Horizontal Layers structure confirmed with user (not Vertical MVP) — Format Engine Core → Abstractions & Orchestration → COM Entry Point & Real Excel Integration → Installation & Registration → CI/CD Pipeline & Release Runbook
 - Roadmap: Phases 1-2 fully verifiable via `dotnet test` alone (no Windows/Excel required); Phases 3-5 require a real Windows+Excel environment and live smoke testing as their definition of done
+- [Phase 01]: Added .gitignore for bin/ and obj/ .NET build artifacts. — The repo had no .gitignore (VBA-era project); running dotnet build immediately generates bin/obj folders that must not be committed as binary artifacts.
+- [Phase 01]: FormatDef is a plain sealed class with constructor-assigned get-only properties, not a C# record. — C# 9 records/init-only properties fail to compile on net48 with CS0518 (IsExternalInit not defined), confirmed empirically in 01-RESEARCH.md; a plain class avoids this while staying immutable.
 
 ### Pending Todos
 
@@ -76,6 +86,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-10
-Stopped at: ROADMAP.md, STATE.md written; REQUIREMENTS.md traceability updated
+Last session: 2026-07-10T20:49:18.978Z
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None

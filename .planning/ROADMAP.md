@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Bootstrap solution/projects (net48;net8.0 Engine + net8.0 xUnit Tests) and shared contract types (FormatKeys, FormatCategory, CellAlignment, FormatDef)
+- [x] 01-01-PLAN.md — Bootstrap solution/projects (net48;net8.0 Engine + net8.0 xUnit Tests) and shared contract types (FormatKeys, FormatCategory, CellAlignment, FormatDef)
 - [ ] 01-02-PLAN.md — AccountingFormatBuilder: port and prove the 16-combination accounting format matrix (FMT-01, FMT-07)
 - [ ] 01-03-PLAN.md — FormatRegistry: wire all 11 format keys (literal Pct/Spread/Date/Text entries + Fin/Integer family via AccountingFormatBuilder) (FMT-02, FMT-03, FMT-04, FMT-05)
 
@@ -90,7 +90,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Format Engine Core | 0/3 | Planned | - |
+| 1. Format Engine Core | 1/3 | In Progress|  |
 | 2. Abstractions & Orchestration | 0/TBD | Not started | - |
 | 3. COM Entry Point & Real Excel Integration | 0/TBD | Not started | - |
 | 4. Installation & Registration | 0/TBD | Not started | - |
