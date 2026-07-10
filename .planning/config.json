@@ -1,0 +1,8 @@
+{
+  "model_profile": "balanced",
+  "model_overrides": {
+    "gsd-planner": "sonnet",
+    "gsd-codebase-mapper": "sonnet"
+  },
+  "mode": "yolo"
+}
