@@ -30,7 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `dotnet test` confirms "Date ISO", "Date BR", and "Date BR Longa" produce the correct format strings with Portuguese month names, independent of any Excel UI-locale setting (FMT-04)
   4. `dotnet test` confirms "Integer" and "Text" produce their corresponding format strings (FMT-05)
   5. The solution (add-in project + test project) builds and all tests run 100% via `dotnet build`/`dotnet test`, with no Visual Studio installation required (DEV-01)
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Bootstrap solution/projects (net48;net8.0 Engine + net8.0 xUnit Tests) and shared contract types (FormatKeys, FormatCategory, CellAlignment, FormatDef)
+- [ ] 01-02-PLAN.md — AccountingFormatBuilder: port and prove the 16-combination accounting format matrix (FMT-01, FMT-07)
+- [ ] 01-03-PLAN.md — FormatRegistry: wire all 11 format keys (literal Pct/Spread/Date/Text entries + Fin/Integer family via AccountingFormatBuilder) (FMT-02, FMT-03, FMT-04, FMT-05)
 
 ### Phase 2: Abstractions & Orchestration
 **Goal**: The seam between business logic and real Excel COM objects (`IExcelGateway`/`IRangeHandle`) exists as interfaces, and the orchestration logic that applies a format to a selection — including the invalid-selection guard — is fully exercised by `dotnet test` using fakes, with no real Excel instance involved.
@@ -85,7 +90,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Format Engine Core | 0/TBD | Not started | - |
+| 1. Format Engine Core | 0/3 | Planned | - |
 | 2. Abstractions & Orchestration | 0/TBD | Not started | - |
 | 3. COM Entry Point & Real Excel Integration | 0/TBD | Not started | - |
 | 4. Installation & Registration | 0/TBD | Not started | - |
