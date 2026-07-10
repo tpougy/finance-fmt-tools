@@ -73,32 +73,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FMT-01 | TBD | Pending |
-| FMT-02 | TBD | Pending |
-| FMT-03 | TBD | Pending |
-| FMT-04 | TBD | Pending |
-| FMT-05 | TBD | Pending |
-| FMT-06 | TBD | Pending |
-| FMT-07 | TBD | Pending |
-| RIB-01 | TBD | Pending |
-| RIB-02 | TBD | Pending |
-| RIB-03 | TBD | Pending |
-| RIB-04 | TBD | Pending |
-| DEV-01 | TBD | Pending |
-| INST-01 | TBD | Pending |
-| INST-02 | TBD | Pending |
-| INST-03 | TBD | Pending |
-| REL-01 | TBD | Pending |
-| REL-02 | TBD | Pending |
-| REL-03 | TBD | Pending |
-| LEGACY-01 | TBD | Pending |
-| LEGACY-02 | TBD | Pending |
+| FMT-01 | Phase 1 - Format Engine Core | Pending |
+| FMT-02 | Phase 1 - Format Engine Core | Pending |
+| FMT-03 | Phase 1 - Format Engine Core | Pending |
+| FMT-04 | Phase 1 - Format Engine Core | Pending |
+| FMT-05 | Phase 1 - Format Engine Core | Pending |
+| FMT-06 | Phase 2 - Abstractions & Orchestration | Pending |
+| FMT-07 | Phase 1 - Format Engine Core | Pending |
+| RIB-01 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
+| RIB-02 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
+| RIB-03 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
+| RIB-04 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
+| DEV-01 | Phase 1 - Format Engine Core | Pending |
+| INST-01 | Phase 4 - Installation & Registration | Pending |
+| INST-02 | Phase 4 - Installation & Registration | Pending |
+| INST-03 | Phase 4 - Installation & Registration | Pending |
+| REL-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
+| REL-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
+| REL-03 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
+| LEGACY-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
+| LEGACY-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
 
 **Coverage:**
-- v1 requirements: 19 total
-- Mapped to phases: 0
-- Unmapped: 19 ⚠️ (filled by roadmap creation)
+- v1 requirements: 20 total (corrected — Format Engine section has 7 items, FMT-01..07; previous count of 19 was an off-by-one error)
+- Mapped to phases: 20
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-10*
-*Last updated: 2026-07-10 after initial definition*
+*Last updated: 2026-07-10 after roadmap creation (traceability filled, coverage count corrected from 19 to 20)*
