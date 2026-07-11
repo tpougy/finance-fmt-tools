@@ -467,14 +467,16 @@ namespace FinanceFmtTools.Engine.Tests
 
 **None of the above are training-data guesses** — all are grounded in direct reads of this repo's own VBA source, this repo's own Phase 1 code/summaries, `REQUIREMENTS.md`/`CONTEXT.md`, an empirical test run in this session, or a concrete local sibling codebase. They are logged here because they represent **design choices left to Claude's discretion** by `02-CONTEXT.md`, not because the underlying facts are unverified.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does `RibbonController` need an `IRibbonUiHandle`-style seam interface in Phase 2, or is checkbox state + XML loading sufficient?**
+1. **RESOLVED — Does `RibbonController` need an `IRibbonUiHandle`-style seam interface in Phase 2, or is checkbox state + XML loading sufficient?**
+   - RESOLVED: No seam added. Planning adopted the narrower reading — `RibbonController` in Phase 2 is scoped to `Config` (checkbox state) + `GetCustomUiXml()` only. Phase 3 owns all real `IRibbonUI` wiring.
    - What we know: `REQUIREMENTS.md` traces RIB-01..04 entirely to Phase 3; Phase 2's only requirement is FMT-06. Roadmap success criterion 3 for Phase 2 only asks for XML-resource loading + checkbox-state queries "using a fake rather than a live IRibbonUI."
    - What's unclear: whether "using a fake" is (a) simply describing the overall no-live-COM testing philosophy of this phase (my recommendation — no new interface needed), or (b) an implicit instruction to build a small `IRibbonUiHandle`/`CacheRibbon(object ribbonUi)`-style seam now (mirroring the sibling project's `IRibbonController.CacheRibbon(object ribbonUi)`, which notably also uses `object` rather than a COM type in its signature specifically so it stays fakeable) so that Phase 3 only has to *implement* it rather than *design* it.
    - Recommendation: Start with the narrower reading (no `IRibbonUiHandle` in Phase 2) since nothing in this add-in currently needs `InvalidateControl` (VBA's own `mRibbon` is captured in `OnRibbonLoad` but never actually invoked anywhere in `modRibbon.bas` — it appears to be unused/defensive-only in the original VBA too [VERIFIED: `src/modRibbon.bas`, full-file read, no `mRibbon.` call site found]). If the planner wants forward-compatibility insurance, a one-method `object CacheRibbonHandle(object ribbonUi)` stub (matching the sibling's `object`-typed signature trick) is a low-cost addition that doesn't violate the zero-COM-type constraint.
 
-2. **Should `RibbonController`'s embedded XML resource be linked from `src/customUI14.xml` (shared with the still-active VBA `.xlam`) or copied into the new project?**
+2. **RESOLVED — Should `RibbonController`'s embedded XML resource be linked from `src/customUI14.xml` (shared with the still-active VBA `.xlam`) or copied into the new project?**
+   - RESOLVED: Linked via MSBuild `<EmbeddedResource Include="../customUI14.xml" Link="..."/>`, not duplicated. Callback names stay identical between VBA and C# during the transition, so shared-source is the safer default.
    - What we know: Linking works mechanically (verified empirically). The VBA source and its `.xlam` build are still the active, released artifact until Phase 5's `LEGACY-01`/`LEGACY-02` archive it.
    - What's unclear: whether the planner wants to guard against someone editing `src/customUI14.xml` for a VBA-side reason mid-migration and unknowingly affecting the in-progress C# build's embedded resource too.
    - Recommendation: Link (Pattern 3) — the callback names must stay identical between the two versions anyway during the transition, so shared-source is actually the safer default, not a risk.
