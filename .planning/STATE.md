@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-02-PLAN.md (Phase 3 Plan 2 of 2 complete — code complete, live-Excel smoke test deferred as human_needed)
-last_updated: "2026-07-11T09:59:55-03:00"
-last_activity: 2026-07-11
+stopped_at: Completed 04-01-PLAN.md (Phase 4 Plan 1 of 3 — install.ps1 done, INST-01/INST-03)
+last_updated: "2026-07-11T14:10:00-03:00"
+last_activity: 2026-07-11 -- Phase 4 execution in progress
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
-  percent: 40
+  completed_phases: 3
+  total_plans: 11
+  completed_plans: 8
+  percent: 55
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Aplicar formatos financeiros/contábeis padronizados a células do Excel com um clique — agora sobre uma base de código C# testável, com dev/build/release 100% via terminal.
-**Current focus:** Phase 3 — COM Entry Point & Real Excel Integration (code complete; live-Excel verification pending)
+**Current focus:** Phase 4 — Installation & Registration (executing)
 
 ## Current Position
 
-Phase: 3 (COM Entry Point & Real Excel Integration) — CODE COMPLETE, plans 2/2 done
-Plan: 2 of 2 — complete (`Connect.cs` + `AddInHost.cs`, all 17 Ribbon callbacks wired)
-Next: Run Phase 3's VERIFICATION.md (will formally record the live-Excel smoke test as `human_needed`), then Phase 4 (Installation & Registration) — needs plan-phase
-Status: Awaiting live-Excel human verification (RIB-01..04 smoke-test checklist recorded in 03-02-SUMMARY.md) — not executable in this Linux/WSL environment, no Windows/Excel/COM runtime available
+Phase: 4 (Installation & Registration) — EXECUTING, plan 1/3 done
+Plan: 1 of 3 — complete (`scripts/install.ps1`, INST-01/INST-03)
+Next: Plan 2 (`scripts/uninstall.ps1` + `verify-environment.ps1`), then Plan 3's live-verification checkpoint (`human_needed`), then Phase 4 code review + VERIFICATION.md, then Phase 5
+Status: Phase 3 remains code-complete/human_needed (unchanged). Phase 4 in progress — install.ps1 done, uninstall.ps1 next. Not executable end-to-end in this Linux/WSL environment (no Windows/Excel/registry) — live install/uninstall behavior deferred to Plan 03's checkpoint.
 Last activity: 2026-07-11
 
-Progress: [█████████░] 86%
+Progress: [███████████░] 90%
 
 ## Performance Metrics
 
@@ -76,6 +76,8 @@ Recent decisions affecting current work:
 - [Phase 03, Plan 01, autonomous decision]: Approved the two `[SUS]`-flagged NuGet packages (`Microsoft.Office.Interop.Excel` 16.0.18925.20022, `MicrosoftOfficeCore16` 16.0.16626.20000, publisher CamronBute) at Plan 01 Task 1's blocking human-verify checkpoint, without pausing to ask the user, per this session's full-autonomy directive. Reasoning: 03-RESEARCH.md's researcher already content-verified both packages (via nuget.org metadata + `.nupkg`/`strings` binary inspection) to contain the genuine, complete Excel/Office Core object model with no malicious content — the "SUS" flag is about missing an official Microsoft publisher badge/license text, not integrity. This is the documented de facto community answer (30.2M downloads) for referencing Office Interop types without a full Office/VSTO install, which Microsoft does not otherwise publish as a standalone NuGet package. The only alternative (vendoring PIA DLLs from a real Windows+Office machine) is unavailable in this Linux/WSL environment and doesn't meaningfully change the trust profile. Flagging this prominently for the user's awareness — reversible later by swapping to vendored PIAs if they disagree.
 - [Phase 03]: [Phase 03, Plan 01]: Bootstrapped FinanceFmtTools.ComAddin (net48-only, the first COM-referencing project in the solution) with real RealExcelGateway/RealRangeHandle/TraceLog implementations of Phase 2's unmodified IExcelGateway/IRangeHandle/ILog interfaces, plus a hand-rolled Extensibility.IDTExtensibility2 shim (GUID B65AD801-ABAF-11D0-BB8B-00A0C90F2744). — Full solution builds 0 Warning(s)/0 Error(s) across all 3 projects; 40/40 tests pass (baseline was actually 40, not the stale "39" in 02-02-SUMMARY.md/plan text — see 03-01-SUMMARY.md Issues Encountered); zero source changes to Phase 1/2 files. Task 1's package-legitimacy checkpoint was pre-approved per orchestrator instruction and STATE.md commit 80f0046, so execution proceeded directly through Tasks 2-3 without pausing.
 - [Phase 03, Plan 02]: Wired `Connect` (the real COM entry point: `IDTExtensibility2`+`IRibbonExtensibility`, `ClassInterfaceType.AutoDispatch`, fixed Guid `881EFDF3-424C-4240-BCA0-714DAC2B9CD7`/ProgId `FinanceFmtTools.Connect`, all 17 `src/customUI14.xml` callback names) on top of a new `AddInHost` composition root (real gateway/log/ribbon wiring; `FormatEngine.Apply` called directly — never `ApplyToSelection` — so Phase 2's tested no-throw contract stays untouched while a live FMT-06 `MessageBox` is added). Full solution builds 0 Warning(s)/0 Error(s), 40/40 tests still pass, zero Phase 1/2 source changes. **Phase 3 is now code-complete (2/2 plans)** but its own goal statement requires a live-Excel smoke test (RIB-01..04) that cannot run in this Linux/WSL environment (no Windows/Excel/COM runtime) — the itemized checklist is recorded verbatim in 03-02-SUMMARY.md's "User Setup Required" section as an explicit `human_needed` item, per 03-CONTEXT.md's non-discretionary constraint. Not treated as a plan or phase failure — this is the expected, by-design outcome for this phase in this environment.
+- [Phase 03 code review + verification]: Fixed 1 critical (Marshal.ReleaseComObject/GC flush missing on disconnect — ghost EXCEL.EXE process leak) + 4 warnings (Range RCW never released, 2 getPressed callbacks missing try/catch, Selection access unguarded against COMException, DBNull mixed-value cast risk) directly in `AddInHost.cs`/`RealRangeHandle.cs`/`RealExcelGateway.cs`/`Connect.cs`. `03-VERIFICATION.md` recorded status `human_needed` (5/5 code-verified, live-Excel smoke test outstanding). REQUIREMENTS.md's RIB-01..04 rows corrected to a consistent "Code complete — human_needed" status (all four, not just RIB-01).
+- [Phase 04, Plan 01]: Wrote `scripts/install.ps1` (447 lines) directly in the main conversation — the subagent originally dispatched for this plan was cut off by an API session-limit error before writing any file or commit, so this was implemented directly against the plan's explicit task spec rather than risking a third subagent attempt on the same plan. Implements INST-01 (GitHub-Releases one-liner default flow, version-agnostic `releases/latest/download/FinanceFmtTools.zip` URL) + INST-03 (`DoNotDisableAddinList` Resiliency key) + a `-Package`/`-Source` local-testing escape hatch (needed since no real C# GitHub release exists yet — only legacy `.xlam` v1.0.0/v1.0.1). Reuses Phase 3's fixed COM identity (`Connect.cs`'s GUID/ProgId/AssemblyName) verbatim — the literal GUID string appears exactly once in the file. Zero `$PSScriptRoot`/`$MyInvocation` dependency (the documented `irm | iex` one-liner has no on-disk script location). All plan-embedded grep-based structural verify checks pass. Live install/uninstall behavior remains `human_needed`, tracked in Plan 03.
 
 ### Pending Todos
 
@@ -97,6 +99,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-11T12:55:14.209Z
-Stopped at: Completed 03-01-PLAN.md (Phase 3 Plan 1 of 2 complete)
+Last session: 2026-07-11T14:10:00-03:00
+Stopped at: Completed 04-01-PLAN.md (Phase 4 Plan 1 of 3 complete)
 Resume file: None
