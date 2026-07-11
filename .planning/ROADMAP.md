@@ -13,7 +13,7 @@ This milestone ports the "Finance Fmt" Excel Ribbon add-in from VBA to a pure C#
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Format Engine Core** - Pure C# format-string logic (Fin/Pct/Spread/Date/Integer/Text), fully covered by `dotnet test`, zero Excel/COM dependency
-- [ ] **Phase 2: Abstractions & Orchestration** - `IExcelGateway`/`IRangeHandle` seam plus `FormatEngine`/`RibbonController` orchestration, unit-tested against fakes
+- [x] **Phase 2: Abstractions & Orchestration** - `IExcelGateway`/`IRangeHandle` seam plus `FormatEngine`/`RibbonController` orchestration, unit-tested against fakes
 - [ ] **Phase 3: COM Entry Point & Real Excel Integration** - Real `Microsoft.Office.Interop.Excel` wiring, Ribbon XML, `Connect.cs`; the Ribbon tab, buttons, checkboxes, and About/docs link work in a live Excel session
 - [ ] **Phase 4: Installation & Registration** - HKCU-only, no-admin PowerShell installer/uninstaller with Resiliency protection
 - [ ] **Phase 5: CI/CD Pipeline & Release Runbook** - Tag-triggered GitHub Actions release pipeline, manual `gh` CLI runbook, changelog, and VBA legacy cleanup confirmation
@@ -49,7 +49,7 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — IExcelGateway/IRangeHandle/ILog seam + FormatEngine.Apply/ApplyToSelection orchestration, including the FMT-06 invalid-selection guard clause
-- [ ] 02-02-PLAN.md — RibbonSessionConfig (RIB-02/RIB-03 authoritative defaults) + RibbonController (in-memory checkbox state, embedded customUI14.xml resource loading)
+- [x] 02-02-PLAN.md — RibbonSessionConfig (RIB-02/RIB-03 authoritative defaults) + RibbonController (in-memory checkbox state, embedded customUI14.xml resource loading)
 
 ### Phase 3: COM Entry Point & Real Excel Integration
 **Goal**: The add-in runs inside a real, live Excel session — the Ribbon tab renders with full parity to the VBA version, every button applies its format, both checkboxes behave correctly for the session, and the About/docs actions work — verified by manual smoke test, not unit tests alone.
@@ -95,7 +95,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Format Engine Core | 3/3 | Complete | 2026-07-11 |
-| 2. Abstractions & Orchestration | 1/2 | In Progress | - |
+| 2. Abstractions & Orchestration | 2/2 | Complete | 2026-07-11 |
 | 3. COM Entry Point & Real Excel Integration | 0/TBD | Not started | - |
 | 4. Installation & Registration | 0/TBD | Not started | - |
 | 5. CI/CD Pipeline & Release Runbook | 0/TBD | Not started | - |
