@@ -2,12 +2,11 @@ namespace FinanceFmtTools.Engine
 {
     // Port of VBA's GetFormatDef registry (src/modFormatEngine.bas:81-170) — the
     // key -> FormatDef lookup that every Ribbon button click resolves through.
-    // The VBA source never assigns f.Alignment in any Case branch, so every entry
-    // (including the Fin family, wired in a later task) carries the General
-    // alignment value below, never the right-aligned one. The Fin family's visual
-    // right-alignment comes entirely from the " * " fill-character token already
-    // embedded by AccountingFormatBuilder.Build, not from a HorizontalAlignment
-    // COM write.
+    // The VBA source never assigns f.Alignment in any Case branch, so every entry,
+    // including the Fin family below, carries the General alignment value,
+    // never the right-aligned one. The Fin family's visual right-alignment comes
+    // entirely from the " * " fill-character token already embedded by
+    // AccountingFormatBuilder.Build, not from a HorizontalAlignment COM write.
     //
     public static class FormatRegistry
     {
