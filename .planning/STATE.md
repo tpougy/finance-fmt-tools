@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-07-10T20:49:18.983Z"
-last_activity: 2026-07-10
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-07-11T00:00:00.000Z"
+last_activity: 2026-07-11
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 ## Current Position
 
 Phase: 1 (Format Engine Core) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
-Last activity: 2026-07-10
+Last activity: 2026-07-11
 
-Progress: [███░░░░░░░] 33%
+Progress: [██████░░░░] 66%
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Recent decisions affecting current work:
 - Roadmap: Phases 1-2 fully verifiable via `dotnet test` alone (no Windows/Excel required); Phases 3-5 require a real Windows+Excel environment and live smoke testing as their definition of done
 - [Phase 01]: Added .gitignore for bin/ and obj/ .NET build artifacts. — The repo had no .gitignore (VBA-era project); running dotnet build immediately generates bin/obj folders that must not be committed as binary artifacts.
 - [Phase 01]: FormatDef is a plain sealed class with constructor-assigned get-only properties, not a C# record. — C# 9 records/init-only properties fail to compile on net48 with CS0518 (IsExternalInit not defined), confirmed empirically in 01-RESEARCH.md; a plain class avoids this while staying immutable.
+- [Phase 01, Plan 02]: AccountingFormatBuilder.Build ported VBA's two-branch structure exactly (general case + explicit decimals==0 override), not unified into one formula — deliberate per 01-RESEARCH.md Pitfall #4. Relies on `new string('0', decimals)`'s native ArgumentOutOfRangeException for negative-input guarding instead of an explicit check.
 
 ### Pending Todos
 
