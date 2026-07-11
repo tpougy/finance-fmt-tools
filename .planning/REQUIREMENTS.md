@@ -10,10 +10,10 @@ Full-parity migration from VBA to C#. No staged rollout — every requirement be
 ### Format Engine (Domain)
 
 - [x] **FMT-01**: Botões "Fin 0D/2D/4D/8D" aplicam formato contábil idêntico ao VBA para as 16 combinações de decimals (0/2/4/8) × Alinhar à direita × Zero contábil
-- [ ] **FMT-02**: Botões "Pct 0,00%" e "Pct 0,0000%" aplicam o formato percentual correspondente
-- [ ] **FMT-03**: Botão "Spread (bps)" aplica o formato de spread em basis points
-- [ ] **FMT-04**: Botões "Date ISO", "Date BR" e "Date BR Longa" aplicam os formatos de data correspondentes, com meses em português independente do idioma da interface do Excel
-- [ ] **FMT-05**: Botões "Integer" e "Text" aplicam os formatos correspondentes
+- [x] **FMT-02**: Botões "Pct 0,00%" e "Pct 0,0000%" aplicam o formato percentual correspondente
+- [x] **FMT-03**: Botão "Spread (bps)" aplica o formato de spread em basis points
+- [x] **FMT-04**: Botões "Date ISO", "Date BR" e "Date BR Longa" aplicam os formatos de data correspondentes, com meses em português independente do idioma da interface do Excel
+- [x] **FMT-05**: Botões "Integer" e "Text" aplicam os formatos correspondentes
 - [ ] **FMT-06**: Aplicar um formato com uma seleção inválida (Chart/Shape em vez de Range) mostra uma mensagem amigável em vez de quebrar o add-in
 - [x] **FMT-07**: O format engine (equivalente ao `AccountingFmt`) tem cobertura de testes xUnit para as 16 combinações, executável via `dotnet test` sem Excel instalado
 
@@ -74,10 +74,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FMT-01 | Phase 1 - Format Engine Core | Complete |
-| FMT-02 | Phase 1 - Format Engine Core | Pending |
-| FMT-03 | Phase 1 - Format Engine Core | Pending |
-| FMT-04 | Phase 1 - Format Engine Core | Pending |
-| FMT-05 | Phase 1 - Format Engine Core | Pending |
+| FMT-02 | Phase 1 - Format Engine Core | Complete |
+| FMT-03 | Phase 1 - Format Engine Core | Complete |
+| FMT-04 | Phase 1 - Format Engine Core | Complete |
+| FMT-05 | Phase 1 - Format Engine Core | Complete |
 | FMT-06 | Phase 2 - Abstractions & Orchestration | Pending |
 | FMT-07 | Phase 1 - Format Engine Core | Complete |
 | RIB-01 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |

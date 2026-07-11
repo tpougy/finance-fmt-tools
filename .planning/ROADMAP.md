@@ -12,7 +12,7 @@ This milestone ports the "Finance Fmt" Excel Ribbon add-in from VBA to a pure C#
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Format Engine Core** - Pure C# format-string logic (Fin/Pct/Spread/Date/Integer/Text), fully covered by `dotnet test`, zero Excel/COM dependency
+- [x] **Phase 1: Format Engine Core** - Pure C# format-string logic (Fin/Pct/Spread/Date/Integer/Text), fully covered by `dotnet test`, zero Excel/COM dependency
 - [ ] **Phase 2: Abstractions & Orchestration** - `IExcelGateway`/`IRangeHandle` seam plus `FormatEngine`/`RibbonController` orchestration, unit-tested against fakes
 - [ ] **Phase 3: COM Entry Point & Real Excel Integration** - Real `Microsoft.Office.Interop.Excel` wiring, Ribbon XML, `Connect.cs`; the Ribbon tab, buttons, checkboxes, and About/docs link work in a live Excel session
 - [ ] **Phase 4: Installation & Registration** - HKCU-only, no-admin PowerShell installer/uninstaller with Resiliency protection
@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md — Bootstrap solution/projects (net48;net8.0 Engine + net8.0 xUnit Tests) and shared contract types (FormatKeys, FormatCategory, CellAlignment, FormatDef)
 - [x] 01-02-PLAN.md — AccountingFormatBuilder: port and prove the 16-combination accounting format matrix (FMT-01, FMT-07)
-- [ ] 01-03-PLAN.md — FormatRegistry: wire all 11 format keys (literal Pct/Spread/Date/Text entries + Fin/Integer family via AccountingFormatBuilder) (FMT-02, FMT-03, FMT-04, FMT-05)
+- [x] 01-03-PLAN.md — FormatRegistry: wire all 11 format keys (literal Pct/Spread/Date/Text entries + Fin/Integer family via AccountingFormatBuilder) (FMT-02, FMT-03, FMT-04, FMT-05)
 
 ### Phase 2: Abstractions & Orchestration
 **Goal**: The seam between business logic and real Excel COM objects (`IExcelGateway`/`IRangeHandle`) exists as interfaces, and the orchestration logic that applies a format to a selection — including the invalid-selection guard — is fully exercised by `dotnet test` using fakes, with no real Excel instance involved.
@@ -90,7 +90,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Format Engine Core | 2/3 | In Progress|  |
+| 1. Format Engine Core | 3/3 | Complete | 2026-07-11 |
 | 2. Abstractions & Orchestration | 0/TBD | Not started | - |
 | 3. COM Entry Point & Real Excel Integration | 0/TBD | Not started | - |
 | 4. Installation & Registration | 0/TBD | Not started | - |
