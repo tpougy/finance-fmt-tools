@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: "Completed 05-03-PLAN.md (LEGACY-01/LEGACY-02: VBA source archived off main, README.md rewritten for C# add-in only)"
-last_updated: "2026-07-11T18:42:17.331Z"
+stopped_at: "Completed 05-04-PLAN.md (Phase 5 code complete, 4/4 plans — real release deferred as human_needed, resume-signal 'deferred — not releasing yet')"
+last_updated: "2026-07-11T19:15:00-03:00"
 last_activity: 2026-07-11
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 14
-  completed_plans: 13
-  percent: 80
+  completed_plans: 14
+  percent: 100
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Aplicar formatos financeiros/contábeis padronizados a células do Excel com um clique — agora sobre uma base de código C# testável, com dev/build/release 100% via terminal.
-**Current focus:** Phase 5 — CI/CD Pipeline & Release Runbook (Plans 1-3 done, Plan 4 human-authorization checkpoint remaining)
+**Current focus:** All 5 phases code-complete. Milestone lifecycle (code review + verification for Phase 5, then audit/complete/cleanup) remaining.
 
 ## Current Position
 
-Phase: 5 (CI/CD Pipeline & Release Runbook) — EXECUTING, plans 3/4 done
-Plan: 3 of 4 complete (05-01 CI workflow, 05-02 release runbook/changelog, 05-03 VBA archival/README rewrite — all executed concurrently in the same wave, no file conflicts)
-Next: Plan 4 (05-04) — pre-flight integration check + human-authorized real release (push `main`/`archive/vba-legacy`, tag, publish) — a blocking human-authorization checkpoint, then Phase 5 code review + VERIFICATION.md
-Status: Phases 3 and 4 remain code-complete/human_needed (live Excel/Windows verification outstanding for both). Phase 5's code/docs deliverables (CI workflow, runbook, changelog, VBA archival, README) are complete and locally committed; nothing has been pushed to the real `origin` remote yet — that is intentionally deferred to 05-04's human-authorization gate, not an oversight.
+Phase: 5 (CI/CD Pipeline & Release Runbook) — CODE COMPLETE, plans 4/4 done
+Plan: 4 of 4 complete (05-01 CI workflow, 05-02 release runbook/changelog, 05-03 VBA archival/README rewrite, 05-04 pre-flight check + human-authorization checkpoint)
+Next: Phase 5 code review, then Phase 5 VERIFICATION.md (expect `human_needed` — real release deferred), then milestone lifecycle (`gsd-audit-milestone` → `gsd-complete-milestone` → `gsd-cleanup`)
+Status: All 5 phases are code-complete. Phases 3, 4, and 5 each carry an explicit, itemized `human_needed` open item (live-Excel smoke test, live install/uninstall test, and the real git push/GitHub Release respectively) — none faked, none skipped, all requiring genuine human action outside this sandbox/session.
 Last activity: 2026-07-11
 
-Progress: [██████████░] 96%
+Progress: [████████████] 100% (code-complete; 3 phases have outstanding human_needed items)
 
 ## Performance Metrics
 
@@ -108,6 +108,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-11T19:00:00-03:00
-Stopped at: Completed 05-01/05-02/05-03 (Phase 5 Wave 1, 3/4 plans) — consolidated STATE.md reconciliation after concurrent parallel execution
+Last session: 2026-07-11T19:15:00-03:00
+Stopped at: Completed 05-04-PLAN.md — Phase 5 fully code-complete (4/4 plans). Proceeding to Phase 5 code review + verification, then milestone lifecycle.
 Resume file: None

@@ -100,7 +100,7 @@ Plans:
 - [x] 05-01-PLAN.md — Tag-triggered GitHub Actions release workflow (.github/workflows/release.yml, .gitignore) (REL-01)
 - [x] 05-02-PLAN.md — Manual gh CLI release runbook (RELEASE.md) + hand-maintained changelog (RELEASE_NOTES.md) (REL-02, REL-03)
 - [x] 05-03-PLAN.md — Archive VBA source off main (LEGACY-01) + rewrite README.md for the C# add-in only (LEGACY-02)
-- [ ] 05-04-PLAN.md — Pre-flight integration check + human-authorized real release (push main, push archive/vba-legacy, tag, publish) (REL-01, REL-02, REL-03, LEGACY-01, LEGACY-02)
+- [x] 05-04-PLAN.md — Pre-flight integration check (ALL_PASS) + human-authorized real release (push main, push archive/vba-legacy, tag, publish) (REL-01, REL-02, REL-03, LEGACY-01, LEGACY-02) — real-remote push/release deferred as human_needed, resume-signal "deferred — not releasing yet"
 
 ## Progress
 
@@ -113,4 +113,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Abstractions & Orchestration | 2/2 | Complete | 2026-07-11 |
 | 3. COM Entry Point & Real Excel Integration | 2/2 | Code complete (live-Excel smoke test `human_needed`) | 2026-07-11 |
 | 4. Installation & Registration | 3/3 | Code complete — verified (live install/uninstall test `human_needed`) | 2026-07-11 |
-| 5. CI/CD Pipeline & Release Runbook | 3/4 | In Progress|  |
+| 5. CI/CD Pipeline & Release Runbook | 4/4 | Code complete (real release `human_needed` — deferred, needs user authorization) | 2026-07-11 |
