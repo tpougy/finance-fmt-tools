@@ -22,5 +22,19 @@ namespace FinanceFmtTools.Engine
 
             log.Info("FormatEngine.Apply: aplicado '" + def.DisplayName + "' em " + range.Address + ".");
         }
+
+        public static void ApplyToSelection(IExcelGateway gateway, ILog log, string formatKey, bool forceAlign, bool zeroDash)
+        {
+            if (!gateway.TryGetSelectedRange(out IRangeHandle range))
+            {
+                // FMT-06: friendly-message behavior at the orchestration level.
+                // The actual user-facing dialog is Phase 3's job; this phase proves
+                // only the no-throw, logged-warning contract (see Pitfall 2).
+                log.Warn("FormatEngine.ApplyToSelection: seleção atual não é um intervalo válido — abortando '" + formatKey + "'.");
+                return;
+            }
+
+            Apply(range, log, formatKey, forceAlign, zeroDash);
+        }
     }
 }
