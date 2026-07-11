@@ -36,5 +36,17 @@ namespace FinanceFmtTools.Engine.Tests
             Assert.True(controller.Config.ForceAlign);
             Assert.False(controller.Config.ZeroDash);
         }
+
+        [Fact]
+        public void GetCustomUiXml_CarregaRecursoEmbutido_ContemTabFinanceFmt()
+        {
+            var controller = new RibbonController();
+
+            string xml = controller.GetCustomUiXml();
+
+            Assert.False(string.IsNullOrEmpty(xml));
+            Assert.Contains("tabFinanceFmt", xml);
+            Assert.Contains("onLoad=\"OnRibbonLoad\"", xml);
+        }
     }
 }
