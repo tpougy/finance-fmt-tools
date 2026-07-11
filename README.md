@@ -1,8 +1,8 @@
 # Finance Format Tools
 
-> Add-in Excel (.xlam) para formatação padronizada de dados financeiros em mercado de capitais.
+> Add-in COM para Excel (C# / .NET Framework 4.8) para formatação padronizada de dados financeiros em mercado de capitais.
 
-**Versão:** 1.0.0 · **Plataforma:** Excel para Windows (Office 2016+)
+**Plataforma:** Excel para Windows (Office 2016+, 64-bit) · **Implementação:** C# (.NET Framework 4.8) COM add-in
 
 ---
 
@@ -11,6 +11,10 @@
 O **Finance Format Tools** é um add-in para Excel desenvolvido para padronizar a formatação de dados em planilhas de renda fixa e mercado de capitais. Ele resolve um problema recorrente em análises de debêntures, CRI/CRA, NTN-B e FIIs: a ausência de um padrão consistente de exibição para taxas, preços unitários, spreads e datas — que muitas vezes resulta em células com formatações inconsistentes, números difíceis de comparar visualmente e erros silenciosos de leitura.
 
 O add-in se integra ao Excel por meio de uma aba customizada no ribbon chamada **Finance Fmt**, que agrupa todos os formatos por categoria. A aplicação é feita com um clique: selecione o intervalo e clique no botão correspondente.
+
+> A implementação original deste add-in era em VBA (`.xlam`). Ela foi completamente migrada para um
+> add-in COM em C#, preservando a mesma experiência de Ribbon para o usuário final. O código-fonte
+> VBA histórico permanece disponível na branch `archive/vba-legacy` para referência.
 
 ### O que o add-in faz
 
@@ -27,7 +31,8 @@ Dois checkboxes globais no ribbon modificam o comportamento de todos os formatos
 - **Forçar à direita** — preenche o espaço vazio da célula com espaços, alinhando os dígitos à direita da coluna.
 - **Zero contábil ("-")** — exibe células com valor exatamente zero como um traço (`-`) no lugar de zeros decimais.
 
-As preferências são persistidas dentro do próprio arquivo `.xlam` via `CustomXMLPart`, portanto sobrevivem ao fechamento e reabertura do Excel.
+> Na versão C#, essas duas preferências são apenas de sessão (ver ["Preferências de sessão"](#preferências-de-sessão)
+> mais abaixo) — elas não são mais persistidas em disco.
 
 ---
 
@@ -168,12 +173,44 @@ Aplica a format string `@`, que força o Excel a tratar o conteúdo da célula c
 
 ## Instalação
 
-Execute o instalador PowerShell abaixo ou baixe o instalador .bat.
+Abra o **PowerShell** no Windows e execute o comando abaixo (não é necessário ser administrador):
 
 ```ps1
-Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/Install-FinanceFmtTools.ps1 | iex
+Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/scripts/install.ps1 | iex
 ```
-Requisitos: Excel para Windows, Office 2016 ou superior.
+
+Isso baixa a release mais recente do GitHub, registra o add-in COM inteiramente em `HKCU`
+(nenhuma chave em `HKLM`, nenhum `regasm`) e valida a instalação automaticamente.
+
+**Requisitos:**
+
+- Windows + Excel 2016 ou superior, **64-bit**
+- .NET Framework 4.8 ou superior
+- Nenhum privilégio de administrador é necessário
+
+**Diagnóstico opcional antes de instalar** — para conferir se a máquina atende aos requisitos de runtime sem instalar nada:
+
+```ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-environment.ps1 -RuntimeOnly
+```
+
+**Para remover o add-in**, use o desinstalador (remove os arquivos e as 3 árvores de registro em `HKCU` criadas pelo instalador):
+
+```ps1
+Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/scripts/uninstall.ps1 | iex
+```
+
+### Atualizando da versão VBA
+
+Se você já tinha o add-in antigo (`.xlam`, VBA) instalado, remova-o **antes** de instalar esta versão,
+para evitar duas abas "Finance Fmt" simultâneas no ribbon:
+
+1. No Excel, vá em **Arquivo > Opções > Suplementos**.
+2. No campo "Gerenciar", selecione **Suplementos COM** e clique em **Ir...**.
+3. Desmarque/remova o suplemento antigo da lista.
+4. Se o arquivo `.xlam` ainda existir em `%APPDATA%\Microsoft\AddIns`, apague-o manualmente.
+
+Depois disso, rode o instalador acima normalmente.
 
 ---
 
@@ -206,39 +243,63 @@ Finance Fmt
 
 ---
 
-## Persistência de configurações
+## Preferências de sessão
 
-As preferências dos checkboxes (**Force Align** e **Zero Dash**) são salvas dentro do próprio arquivo `.xlam` usando um `CustomXMLPart` com namespace `urn:finance-fmt-tools`:
-
-```xml
-<FmtConfig xmlns="urn:finance-fmt-tools">
-  <ForceAlign>true</ForceAlign>
-  <ZeroDash>false</ZeroDash>
-</FmtConfig>
-```
-
-Isso significa que as configurações sobrevivem ao fechamento do Excel e são carregadas automaticamente na próxima sessão, sem depender de registro do Windows, arquivos `.ini` externos ou outras fontes.
+Os dois checkboxes do ribbon (**Alinhar à direita** e **Zero contábil**) são apenas de sessão na
+versão C#: eles sempre voltam para os valores padrão (desativado / ativado, respectivamente) toda
+vez que o Excel é reiniciado. Não há nenhum mecanismo de persistência em disco, registro do Windows
+ou dentro do próprio add-in — essa é uma mudança deliberada de comportamento em relação à versão VBA
+antiga (que persistia essas preferências gravando um bloco de XML customizado dentro do próprio
+arquivo `.xlam`).
 
 ---
 
 ## Arquitetura do projeto
 
 ```
-RBR Finance Tools.xlam
+src/
+├── customUI14.xml                  Ribbon XML — define a aba "Finance Fmt" e seus controles
+│                                    (embutido como EmbeddedResource em FinanceFmtTools.Engine)
 │
-├── customUI14.xml      Ribbon XML — define a aba "Finance Fmt" e seus controles
+├── FinanceFmtTools.Engine/         Motor de formatação puro C# — FormatRegistry, FormatEngine,
+│                                   AccountingFormatBuilder, abstrações IExcelGateway/IRangeHandle/ILog
 │
-├── modConfig.bas       Constantes globais, chaves de formato e estado dos checkboxes
-├── modFormatEngine.bas Motor central — GetFormatDef(), ApplyFormat(), AccountingFmt()
-├── modRibbon.bas       Callbacks do ribbon — wrappers de uma linha para cada botão
-└── modUtils.bas        Log, SafeSelection, ShowAbout, persistência em CustomXMLPart
+├── FinanceFmtTools.ComAddin/       Ponto de entrada COM — Connect.cs (IDTExtensibility2 /
+│                                   IRibbonExtensibility) e AddInHost.cs (composição real:
+│                                   gateway/log/ribbon reais, callbacks do ribbon)
+│
+├── FinanceFmtTools.Engine.Tests/   Testes automatizados (xUnit) do motor de formatação
+│
+└── FinanceFmtTools.sln
 ```
 
 **Princípios de design:**
 
-- Todo acesso a `Selection` passa por `SafeSelection()` em `modUtils` — nenhum outro módulo toca `Selection` diretamente.
-- Cada callback do ribbon tem exatamente uma linha de lógica; toda a lógica real vive em `modFormatEngine` ou `modUtils`.
-- Para adicionar um novo formato: crie uma constante em `modConfig`, adicione um `Case` em `GetFormatDef()` em `modFormatEngine`, e adicione um botão em `customUI14.xml` com o callback em `modRibbon`. Nenhum outro arquivo precisa ser modificado.
+- Toda a lógica de formatação passa por `FormatEngine.Apply`/`ApplyToSelection` em `FinanceFmtTools.Engine` — nenhum callback do ribbon toca a API de `Range`/`NumberFormat` diretamente.
+- `Connect.cs` é o único ponto de contato entre o Excel (COM) e o resto do código — cada callback do ribbon é um encaminhamento de uma linha para `AddInHost`.
+- Para adicionar um novo formato: adicione uma entrada em `FormatRegistry`, exponha a constante correspondente, e adicione um botão em `customUI14.xml` com o callback em `Connect.cs`.
+
+O código-fonte VBA original (pré-migração) permanece disponível, na íntegra, na branch
+[`archive/vba-legacy`](https://github.com/tpougy/finance-fmt-tools/tree/archive/vba-legacy), para
+referência histórica — não faz mais parte do fluxo ativo de build/release em `main`.
+
+---
+
+## Desenvolvimento
+
+Todo o fluxo de build e teste roda 100% via terminal (`dotnet` CLI), sem exigir instalação completa
+do Visual Studio — apenas VS Code (ou qualquer editor) + o .NET SDK.
+
+```bash
+# Compilar a solução inteira
+dotnet build src/FinanceFmtTools.sln -c Release
+
+# Rodar os testes automatizados (xUnit)
+dotnet test src/FinanceFmtTools.Engine.Tests/FinanceFmtTools.Engine.Tests.csproj -c Release
+```
+
+Releases são publicadas automaticamente ao enviar uma tag `vX.Y.Z` (ver `.github/workflows/release.yml`),
+com um fallback manual documentado em `RELEASE.md` via `gh` CLI.
 
 ---
 
