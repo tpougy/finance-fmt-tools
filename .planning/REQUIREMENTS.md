@@ -85,9 +85,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RIB-03 | Phase 3 - COM Entry Point & Real Excel Integration | Code complete — human_needed (live Excel smoke test) |
 | RIB-04 | Phase 3 - COM Entry Point & Real Excel Integration | Code complete — human_needed (live Excel smoke test) |
 | DEV-01 | Phase 1 - Format Engine Core | Complete |
-| INST-01 | Phase 4 - Installation & Registration | Pending |
-| INST-02 | Phase 4 - Installation & Registration | Pending |
-| INST-03 | Phase 4 - Installation & Registration | Pending |
+| INST-01 | Phase 4 - Installation & Registration | Code complete — human_needed (live install/uninstall test) |
+| INST-02 | Phase 4 - Installation & Registration | Code complete — human_needed (live install/uninstall test) |
+| INST-03 | Phase 4 - Installation & Registration | Code complete — human_needed (live install/uninstall test) |
 | REL-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
 | REL-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
 | REL-03 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |

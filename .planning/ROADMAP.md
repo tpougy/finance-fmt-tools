@@ -81,8 +81,8 @@ Plans:
 
 Plans:
 - [x] 04-01-PLAN.md — install.ps1: GitHub-Releases one-liner + -Package/-Source local escape hatch + 3-registry-tree HKCU registration (INST-01, INST-03)
-- [ ] 04-02-PLAN.md — uninstall.ps1: idempotent removal of the 3 registry trees + installed files (INST-02), plus verify-environment.ps1 read-only diagnostic
-- [ ] 04-03-PLAN.md — Live install/uninstall/idempotency/Resiliency verification checklist on real Windows+Excel (human_needed, INST-01/02/03)
+- [x] 04-02-PLAN.md — uninstall.ps1: idempotent removal of the 3 registry trees + installed files (INST-02), plus verify-environment.ps1 read-only diagnostic
+- [x] 04-03-PLAN.md — Live install/uninstall/idempotency/Resiliency verification checklist on real Windows+Excel (human_needed, INST-01/02/03) — precondition (`dotnet build`) verified green; live checklist recorded as open human_needed item
 
 ### Phase 5: CI/CD Pipeline & Release Runbook
 **Goal**: Releases are fully automated from a tag push, a documented manual fallback exists for a person or AI agent to cut a release without CI, and the VBA legacy code/docs are completely out of the active `main` flow.
@@ -106,5 +106,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Format Engine Core | 3/3 | Complete | 2026-07-11 |
 | 2. Abstractions & Orchestration | 2/2 | Complete | 2026-07-11 |
 | 3. COM Entry Point & Real Excel Integration | 2/2 | Code complete (live-Excel smoke test `human_needed`) | 2026-07-11 |
-| 4. Installation & Registration | 1/3 | Executing | - |
+| 4. Installation & Registration | 3/3 | Code complete (live install/uninstall test `human_needed`) | 2026-07-11 |
 | 5. CI/CD Pipeline & Release Runbook | 0/TBD | Not started | - |

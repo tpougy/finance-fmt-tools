@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md (Phase 4 Plan 1 of 3 — install.ps1 done, INST-01/INST-03)
-last_updated: "2026-07-11T14:10:00-03:00"
-last_activity: 2026-07-11 -- Phase 4 execution in progress
+stopped_at: Completed 04-03-PLAN.md (Phase 4 code complete, 3/3 plans — live install/uninstall test deferred as human_needed)
+last_updated: "2026-07-11T14:45:00-03:00"
+last_activity: 2026-07-11 -- Phase 4 code complete
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 11
-  completed_plans: 8
-  percent: 55
+  completed_phases: 2
+  total_plans: 10
+  completed_plans: 10
+  percent: 40
 ---
 
 # Project State
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Aplicar formatos financeiros/contábeis padronizados a células do Excel com um clique — agora sobre uma base de código C# testável, com dev/build/release 100% via terminal.
-**Current focus:** Phase 4 — Installation & Registration (executing)
+**Current focus:** Phase 4 — Installation & Registration (code complete; live install/uninstall verification pending)
 
 ## Current Position
 
-Phase: 4 (Installation & Registration) — EXECUTING, plan 1/3 done
-Plan: 1 of 3 — complete (`scripts/install.ps1`, INST-01/INST-03)
-Next: Plan 2 (`scripts/uninstall.ps1` + `verify-environment.ps1`), then Plan 3's live-verification checkpoint (`human_needed`), then Phase 4 code review + VERIFICATION.md, then Phase 5
-Status: Phase 3 remains code-complete/human_needed (unchanged). Phase 4 in progress — install.ps1 done, uninstall.ps1 next. Not executable end-to-end in this Linux/WSL environment (no Windows/Excel/registry) — live install/uninstall behavior deferred to Plan 03's checkpoint.
+Phase: 4 (Installation & Registration) — CODE COMPLETE, plans 3/3 done
+Plan: 3 of 3 — complete (live install/uninstall/idempotency/Resiliency checklist recorded as `human_needed`, precondition `dotnet build` verified green)
+Next: Phase 4 code review (`scripts/*.ps1`), then Phase 4 VERIFICATION.md (expect `human_needed`, mirroring Phase 3), then Phase 5 (CI/CD Pipeline & Release Runbook) — needs context/research/plan-phase
+Status: Phase 3 and Phase 4 are both code-complete/human_needed (unchanged for Phase 3; Phase 4 newly reached this state). Not executable end-to-end in this Linux/WSL environment (no Windows/Excel/registry) — live install/uninstall behavior deferred to 04-03-SUMMARY.md's itemized checklist.
 Last activity: 2026-07-11
 
-Progress: [███████████░] 90%
+Progress: [████████████░] 95%
 
 ## Performance Metrics
 
@@ -78,6 +78,8 @@ Recent decisions affecting current work:
 - [Phase 03, Plan 02]: Wired `Connect` (the real COM entry point: `IDTExtensibility2`+`IRibbonExtensibility`, `ClassInterfaceType.AutoDispatch`, fixed Guid `881EFDF3-424C-4240-BCA0-714DAC2B9CD7`/ProgId `FinanceFmtTools.Connect`, all 17 `src/customUI14.xml` callback names) on top of a new `AddInHost` composition root (real gateway/log/ribbon wiring; `FormatEngine.Apply` called directly — never `ApplyToSelection` — so Phase 2's tested no-throw contract stays untouched while a live FMT-06 `MessageBox` is added). Full solution builds 0 Warning(s)/0 Error(s), 40/40 tests still pass, zero Phase 1/2 source changes. **Phase 3 is now code-complete (2/2 plans)** but its own goal statement requires a live-Excel smoke test (RIB-01..04) that cannot run in this Linux/WSL environment (no Windows/Excel/COM runtime) — the itemized checklist is recorded verbatim in 03-02-SUMMARY.md's "User Setup Required" section as an explicit `human_needed` item, per 03-CONTEXT.md's non-discretionary constraint. Not treated as a plan or phase failure — this is the expected, by-design outcome for this phase in this environment.
 - [Phase 03 code review + verification]: Fixed 1 critical (Marshal.ReleaseComObject/GC flush missing on disconnect — ghost EXCEL.EXE process leak) + 4 warnings (Range RCW never released, 2 getPressed callbacks missing try/catch, Selection access unguarded against COMException, DBNull mixed-value cast risk) directly in `AddInHost.cs`/`RealRangeHandle.cs`/`RealExcelGateway.cs`/`Connect.cs`. `03-VERIFICATION.md` recorded status `human_needed` (5/5 code-verified, live-Excel smoke test outstanding). REQUIREMENTS.md's RIB-01..04 rows corrected to a consistent "Code complete — human_needed" status (all four, not just RIB-01).
 - [Phase 04, Plan 01]: Wrote `scripts/install.ps1` (447 lines) directly in the main conversation — the subagent originally dispatched for this plan was cut off by an API session-limit error before writing any file or commit, so this was implemented directly against the plan's explicit task spec rather than risking a third subagent attempt on the same plan. Implements INST-01 (GitHub-Releases one-liner default flow, version-agnostic `releases/latest/download/FinanceFmtTools.zip` URL) + INST-03 (`DoNotDisableAddinList` Resiliency key) + a `-Package`/`-Source` local-testing escape hatch (needed since no real C# GitHub release exists yet — only legacy `.xlam` v1.0.0/v1.0.1). Reuses Phase 3's fixed COM identity (`Connect.cs`'s GUID/ProgId/AssemblyName) verbatim — the literal GUID string appears exactly once in the file. Zero `$PSScriptRoot`/`$MyInvocation` dependency (the documented `irm | iex` one-liner has no on-disk script location). All plan-embedded grep-based structural verify checks pass. Live install/uninstall behavior remains `human_needed`, tracked in Plan 03.
+- [Phase 04, Plan 02]: Wrote `scripts/uninstall.ps1` (176 lines, INST-02) and `scripts/verify-environment.ps1` (279 lines, discretionary read-only diagnostic), both directly in the main conversation for the same recovery reason as Plan 01. `uninstall.ps1` removes all 3 HKCU registry trees `install.ps1` writes — CLSID subtree, ProgId mapping, non-versioned Excel discovery key via `Remove-KeyIfExists`, plus the Resiliency value via `Remove-ItemProperty` only (never deletes the shared `DoNotDisableAddinList` parent key) — and the 4 installed files, exiting 0 unconditionally except when Excel is running without `-Force`. No `-RemoveLogs` concept exists (unlike the sibling project) since `TraceLog` writes via `System.Diagnostics.Trace`, not to a file. All plan-embedded grep checks pass for both files.
+- [Phase 04, Plan 03]: Task 1 is a `checkpoint:human-verify gate="blocking"` requiring a real Windows+Excel machine. Ran the one automatable precondition (`dotnet build src/FinanceFmtTools.sln -c Release` — 0 Warning(s)/0 Error(s)) and confirmed all 4 files `install.ps1`/`uninstall.ps1` expect (`FinanceFmtTools.ComAddin.dll`, `FinanceFmtTools.Engine.dll`, `Microsoft.Office.Interop.Excel.dll`, `office.dll`) exist in the build output. The live install/uninstall/idempotency/Resiliency-behavior checklist itself (8 steps) is recorded verbatim in `04-03-SUMMARY.md` as an explicit `human_needed` item — not approved, faked, or assumed — mirroring Phase 3's identical precedent exactly. **Phase 4 (Installation & Registration) is now code-complete (3/3 plans)**, same status class as Phase 3.
 
 ### Pending Todos
 
