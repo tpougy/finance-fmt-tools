@@ -19,7 +19,7 @@ Full-parity migration from VBA to C#. No staged rollout — every requirement be
 
 ### Ribbon & Checkboxes
 
-- [ ] **RIB-01**: A aba "Finance Fmt" aparece na Ribbon com os mesmos grupos, botões e tooltips da versão VBA
+- [x] **RIB-01**: A aba "Finance Fmt" aparece na Ribbon com os mesmos grupos, botões e tooltips da versão VBA
 - [ ] **RIB-02**: Checkbox "Alinhar à direita" funciona durante a sessão (afeta os formatos aplicados), inicia sempre desligado ao abrir o Excel, sem persistência entre sessões
 - [ ] **RIB-03**: Checkbox "Zero contábil" funciona durante a sessão (afeta os formatos aplicados), inicia sempre ligado ao abrir o Excel, sem persistência entre sessões
 - [ ] **RIB-04**: Botão "Sobre" e o link de documentação funcionam a partir da Ribbon
@@ -80,7 +80,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FMT-05 | Phase 1 - Format Engine Core | Complete |
 | FMT-06 | Phase 2 - Abstractions & Orchestration | Complete |
 | FMT-07 | Phase 1 - Format Engine Core | Complete |
-| RIB-01 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
+| RIB-01 | Phase 3 - COM Entry Point & Real Excel Integration | Complete |
 | RIB-02 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
 | RIB-03 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
 | RIB-04 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |

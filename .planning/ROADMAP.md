@@ -64,7 +64,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Bootstrap FinanceFmtTools.ComAddin (net48-only) + hand-rolled Extensibility shim + real IExcelGateway/IRangeHandle/ILog implementations (RIB-01 foundation)
+- [x] 03-01-PLAN.md — Bootstrap FinanceFmtTools.ComAddin (net48-only) + hand-rolled Extensibility shim + real IExcelGateway/IRangeHandle/ILog implementations (RIB-01 foundation)
 - [ ] 03-02-PLAN.md — Connect.cs (COM entry point, all 17 Ribbon callbacks) + AddInHost composition root + live Excel smoke test checklist (RIB-01, RIB-02, RIB-03, RIB-04)
 **UI hint**: yes
 
@@ -100,6 +100,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Format Engine Core | 3/3 | Complete | 2026-07-11 |
 | 2. Abstractions & Orchestration | 2/2 | Complete | 2026-07-11 |
-| 3. COM Entry Point & Real Excel Integration | 0/2 | Not started | - |
+| 3. COM Entry Point & Real Excel Integration | 1/2 | In Progress|  |
 | 4. Installation & Registration | 0/TBD | Not started | - |
 | 5. CI/CD Pipeline & Release Runbook | 0/TBD | Not started | - |
