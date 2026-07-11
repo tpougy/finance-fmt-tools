@@ -2,9 +2,9 @@
 
 Changelog mantido manualmente. Cada release publicada (automática via `.github/workflows/release.yml`
 ou manual via `gh release create`, ver `RELEASE.md`) usa o conteúdo deste arquivo como corpo da
-release (`body_path`/`-F RELEASE_NOTES.md`). Depois de uma release ser criada no GitHub, o texto
-publicado é permanente — este arquivo é sobrescrito com a entrada da próxima versão antes de cada
-nova tag.
+release (`body_path`/`-F RELEASE_NOTES.md`). Este arquivo é sobrescrito com a entrada da próxima
+versão antes de cada nova tag — o histórico de versões anteriores só fica preservado na página de
+Releases do GitHub (editável de lá via `gh release edit`, não neste arquivo).
 
 ---
 
@@ -20,10 +20,9 @@ completo.
 ### O que mudou
 
 - **Format engine portado para C#**: todos os botões de formatação (contábil `Fin 0D/2D/4D/8D`,
-  percentual `Pct 0,00%`/`Pct 0,0000%`, `Spread (bps)`, datas `Date ISO`/`Date BR`/`Date BR Longa`,
-  `Integer` e `Text`) foram portados 1:1 a partir do VBA original, com cobertura de testes xUnit
-  automatizados (`dotnet test`) para as 16 combinações do formato contábil (decimais × alinhamento ×
-  zero contábil).
+  percentual `% 2D`/`% 4D`, `Spread bps`, datas `ISO`/`BR`/`BR Extenso` e `Texto`) foram portados 1:1
+  a partir do VBA original, com cobertura de testes xUnit automatizados (`dotnet test`) para as 16
+  combinações do formato contábil (decimais × alinhamento × zero contábil).
 - **Novo instalador/desinstalador HKCU**: `scripts/install.ps1` e `scripts/uninstall.ps1` substituem
   o antigo `Install-FinanceFmtTools.ps1` (que usava automação COM do Excel para instalar o `.xlam`
   em `%APPDATA%\Microsoft\AddIns`). O novo fluxo registra o add-in COM inteiramente em `HKCU`, sem

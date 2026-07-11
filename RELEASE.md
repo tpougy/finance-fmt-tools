@@ -56,6 +56,8 @@ gh --version
 4. **Compilar e empacotar localmente** (mesma sequência usada pelo workflow de CI):
 
    ```powershell
+   $ErrorActionPreference = 'Stop'
+
    dotnet restore src\FinanceFmtTools.sln
    dotnet build src\FinanceFmtTools.sln -c Release --no-restore
    dotnet test src\FinanceFmtTools.Engine.Tests\FinanceFmtTools.Engine.Tests.csproj -c Release --no-build
@@ -63,17 +65,32 @@ gh --version
    $binSrc = "src\FinanceFmtTools.ComAddin\bin\Release\net48"
    New-Item -ItemType Directory -Path staging -Force | Out-Null
 
-   Copy-Item "$binSrc\FinanceFmtTools.ComAddin.dll"       staging\
-   Copy-Item "$binSrc\FinanceFmtTools.Engine.dll"         staging\
-   Copy-Item "$binSrc\Microsoft.Office.Interop.Excel.dll" staging\
-   Copy-Item "$binSrc\office.dll"                         staging\
-   Copy-Item scripts\install.ps1            staging\
-   Copy-Item scripts\uninstall.ps1          staging\
-   Copy-Item scripts\verify-environment.ps1 staging\
+   # Cada entrada precisa existir -- Copy-Item sozinho falha "soft" (escreve no stream
+   # de erro sem lançar) quando a origem não existe, o que geraria um
+   # FinanceFmtTools.zip incompleto sem nenhum sinal de falha.
+   $required = @(
+     "$binSrc\FinanceFmtTools.ComAddin.dll",
+     "$binSrc\FinanceFmtTools.Engine.dll",
+     "$binSrc\Microsoft.Office.Interop.Excel.dll",
+     "$binSrc\office.dll",
+     "scripts\install.ps1",
+     "scripts\uninstall.ps1",
+     "scripts\verify-environment.ps1"
+   )
+   foreach ($f in $required) {
+     if (-not (Test-Path -LiteralPath $f)) { throw "Arquivo obrigatório ausente para o pacote: $f" }
+     Copy-Item -LiteralPath $f -Destination staging\ -Force
+   }
 
    # Nome FIXO e literal -- scripts/install.ps1 depende de "FinanceFmtTools.zip"
    # nunca mudar de nome entre releases (URL .../releases/latest/download/ fixa).
    Compress-Archive -Path staging\* -DestinationPath FinanceFmtTools.zip -Force
+
+   # Confere que o zip resultante contém exatamente os 7 arquivos esperados antes de
+   # publicar (manual ou automático) -- não confie apenas em "o script rodou sem erro".
+   $zipEntries = (Get-ChildItem staging -File -Name) | Sort-Object
+   $expected   = ($required | ForEach-Object { Split-Path $_ -Leaf }) | Sort-Object
+   if (Compare-Object $zipEntries $expected) { throw "staging\ não contém exatamente os arquivos esperados." }
    ```
 
 5. **Criar a tag git e publicar** — nesta ordem exata (`main` primeiro, tag depois):

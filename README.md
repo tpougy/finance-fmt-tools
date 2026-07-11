@@ -159,11 +159,11 @@ O valor esperado é o spread já em pontos-base (ex.: `125.0` exibe `125,0 bps`)
 
 | Botão | String de formato | Exemplo |
 |---|---|---|
-| ISO | `yyyy-mm-dd` | `2025-03-15` |
-| BR | `[$-pt-BR]dd/mm/yyyy` | `15/03/2025` |
-| BR Extenso | `[$-pt-BR]dd/mmm/yyyy` | `15/mar/2025` |
+| ISO | `yyyy-mm-dd;@` | `2025-03-15` |
+| BR | `[$-pt-BR]dd/mm/yyyy;@` | `15/03/2025` |
+| BR Extenso | `[$-pt-BR]dd/mmm/yyyy;@` | `15/mar/2025` |
 
-O prefixo `[$-pt-BR]` instrui o Excel a usar o locale pt-BR para abreviações de meses, independentemente do locale configurado no sistema operacional.
+O prefixo `[$-pt-BR]` instrui o Excel a usar o locale pt-BR para abreviações de meses, independentemente do locale configurado no sistema operacional. A seção final `;@` faz o Excel exibir valores de texto na célula verbatim, em vez de tentar coagi-los ao formato de data (mesmo papel do token de fallback de texto usado na família Fin xD).
 
 ### Texto
 
@@ -179,12 +179,15 @@ Abra o **PowerShell** no Windows e execute o comando abaixo (não é necessário
 Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/scripts/install.ps1 | iex
 ```
 
+> Este comando baixa e executa `install.ps1` diretamente do branch `main`, sem checksum ou
+> assinatura — revise o script antes de rodar se preferir uma verificação manual.
+
 Isso baixa a release mais recente do GitHub, registra o add-in COM inteiramente em `HKCU`
 (nenhuma chave em `HKLM`, nenhum `regasm`) e valida a instalação automaticamente.
 
 **Requisitos:**
 
-- Windows + Excel 2016 ou superior, **64-bit**
+- Windows + Excel 2016 ou superior (baseline validado: **64-bit** — 32-bit não é bloqueado pelo instalador, mas não é testado)
 - .NET Framework 4.8 ou superior
 - Nenhum privilégio de administrador é necessário
 
@@ -231,13 +234,13 @@ Finance Fmt
 │   ├── % 2D            → 0.00%
 │   └── Spread bps      → #,##0.0 bps
 ├── Data
-│   ├── ISO             → yyyy-mm-dd
-│   ├── BR              → dd/mm/yyyy
-│   └── BR Extenso      → dd/mmm/yyyy
+│   ├── ISO             → yyyy-mm-dd;@
+│   ├── BR              → dd/mm/yyyy;@
+│   └── BR Extenso      → dd/mmm/yyyy;@
 ├── Texto
 │   └── Texto           → @
 └── Info
-    ├── Guia Fin        → abre esta documentação
+    ├── Documentação    → abre esta documentação
     └── Sobre           → versão do add-in
 ```
 
@@ -305,4 +308,4 @@ com um fallback manual documentado em `RELEASE.md` via `gh` CLI.
 
 ## Licença
 
-<!-- Adicionar licença aqui -->
+MIT — ver [`LICENSE`](./LICENSE).

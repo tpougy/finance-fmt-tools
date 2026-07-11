@@ -16,12 +16,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '8.0.422'
 
       - name: Restore
         run: dotnet restore src\FinanceFmtTools.sln
@@ -35,16 +35,26 @@ jobs:
       - name: Package
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
           $binSrc = "src\FinanceFmtTools.ComAddin\bin\Release\net48"
           New-Item -ItemType Directory -Path staging -Force | Out-Null
 
-          Copy-Item "$binSrc\FinanceFmtTools.ComAddin.dll"       staging\
-          Copy-Item "$binSrc\FinanceFmtTools.Engine.dll"         staging\
-          Copy-Item "$binSrc\Microsoft.Office.Interop.Excel.dll" staging\
-          Copy-Item "$binSrc\office.dll"                         staging\
-          Copy-Item scripts\install.ps1            staging\
-          Copy-Item scripts\uninstall.ps1          staging\
-          Copy-Item scripts\verify-environment.ps1 staging\
+          # Cada entrada precisa existir -- Copy-Item sozinho falha "soft" (escreve no
+          # stream de erro sem lançar) quando a origem não existe, o que publicaria um
+          # FinanceFmtTools.zip incompleto sem sinal de falha no CI.
+          $required = @(
+            "$binSrc\FinanceFmtTools.ComAddin.dll",
+            "$binSrc\FinanceFmtTools.Engine.dll",
+            "$binSrc\Microsoft.Office.Interop.Excel.dll",
+            "$binSrc\office.dll",
+            "scripts\install.ps1",
+            "scripts\uninstall.ps1",
+            "scripts\verify-environment.ps1"
+          )
+          foreach ($f in $required) {
+            if (-not (Test-Path -LiteralPath $f)) { throw "Arquivo obrigatório ausente para o pacote: $f" }
+            Copy-Item -LiteralPath $f -Destination staging\ -Force
+          }
 
           # FIXED literal name -- scripts/install.ps1's $AssetName constant and its
           # ".../releases/latest/download/FinanceFmtTools.zip" URL depend on this exact
@@ -52,7 +62,7 @@ jobs:
           Compress-Archive -Path staging\* -DestinationPath FinanceFmtTools.zip -Force
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: ${{ github.ref_name }}
           name: Finance Fmt Tools ${{ github.ref_name }}
