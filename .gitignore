@@ -8,3 +8,7 @@ obj/
 # OS
 .DS_Store
 Thumbs.db
+
+# Release packaging artifacts (local manual-runbook test runs)
+FinanceFmtTools.zip
+staging/
