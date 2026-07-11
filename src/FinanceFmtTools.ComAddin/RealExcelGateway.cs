@@ -18,7 +18,19 @@ namespace FinanceFmtTools.ComAddin
 
         public bool TryGetSelectedRange(out IRangeHandle range)
         {
-            object sel = _app.Selection; // typed `object` in the real PIA — Selection can be Range/Chart/Shape/etc.
+            object sel;
+            try
+            {
+                // Selection throws COMException when no workbook is open (or nothing is selectable) —
+                // that is functionally an invalid selection for FMT-06's purposes, not a crash.
+                sel = _app.Selection; // typed `object` in the real PIA — Selection can be Range/Chart/Shape/etc.
+            }
+            catch (COMException)
+            {
+                range = null;
+                return false;
+            }
+
             if (sel is Excel.Range r)
             {
                 range = new RealRangeHandle(r);

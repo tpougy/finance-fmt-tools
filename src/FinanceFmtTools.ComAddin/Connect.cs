@@ -140,7 +140,11 @@ namespace FinanceFmtTools.ComAddin
             catch (Exception ex) { TryLog(ex); }
         }
 
-        public bool RibbonGetForceAlign(Office.IRibbonControl control) => _host.GetForceAlign();
+        public bool RibbonGetForceAlign(Office.IRibbonControl control)
+        {
+            try { return _host.GetForceAlign(); }
+            catch (Exception ex) { TryLog(ex); return false; }
+        }
 
         public void RibbonChkZeroDash(Office.IRibbonControl control, bool pressed)
         {
@@ -148,7 +152,11 @@ namespace FinanceFmtTools.ComAddin
             catch (Exception ex) { TryLog(ex); }
         }
 
-        public bool RibbonGetZeroDash(Office.IRibbonControl control) => _host.GetZeroDash();
+        public bool RibbonGetZeroDash(Office.IRibbonControl control)
+        {
+            try { return _host.GetZeroDash(); }
+            catch (Exception ex) { TryLog(ex); return true; }
+        }
 
         // -- Info -------------------------------------------------------------------------------------
 

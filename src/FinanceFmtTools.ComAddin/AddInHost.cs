@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using FinanceFmtTools.Engine;
 using FinanceFmtTools.Engine.Abstractions;
@@ -25,6 +26,7 @@ namespace FinanceFmtTools.ComAddin
         // even before Excel finishes calling OnConnection.
         private readonly RibbonController _ribbon = new RibbonController();
 
+        private Excel.Application _app;
         private RealExcelGateway _gateway;
         private Office.IRibbonUI _ribbonUi;
 
@@ -48,6 +50,7 @@ namespace FinanceFmtTools.ComAddin
                     return;
                 }
 
+                _app = app;
                 _gateway = new RealExcelGateway(app);
                 _log.Info("AddInHost.Wire: conectado ao Excel.Application.");
             }
@@ -57,10 +60,48 @@ namespace FinanceFmtTools.ComAddin
             }
         }
 
+        // Releases every cached COM reference (Excel.Application, IRibbonUI) and forces the RCWs to be
+        // reclaimed immediately rather than waiting on GC finalization — the standard fix for the classic
+        // "EXCEL.EXE lingers as a ghost process after the workbook closes" Office-interop leak.
         public void Teardown()
         {
-            _gateway = null;
-            _ribbonUi = null;
+            try
+            {
+                if (_ribbonUi != null && Marshal.IsComObject(_ribbonUi))
+                {
+                    Marshal.ReleaseComObject(_ribbonUi);
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error("AddInHost.Teardown (ribbonUi release): " + ex);
+            }
+            finally
+            {
+                _ribbonUi = null;
+            }
+
+            try
+            {
+                if (_app != null && Marshal.IsComObject(_app))
+                {
+                    Marshal.ReleaseComObject(_app);
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Error("AddInHost.Teardown (app release): " + ex);
+            }
+            finally
+            {
+                _app = null;
+                _gateway = null;
+            }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         public void CacheRibbonUi(object ribbonUi)
@@ -95,7 +136,16 @@ namespace FinanceFmtTools.ComAddin
                 return;
             }
 
-            FormatEngine.Apply(range, _log, formatKey, _ribbon.Config.ForceAlign, _ribbon.Config.ZeroDash);
+            try
+            {
+                FormatEngine.Apply(range, _log, formatKey, _ribbon.Config.ForceAlign, _ribbon.Config.ZeroDash);
+            }
+            finally
+            {
+                // Release the wrapped Range RCW promptly rather than waiting on GC finalization —
+                // IDisposable is on RealRangeHandle itself, not on Phase 2's IRangeHandle contract.
+                (range as IDisposable)?.Dispose();
+            }
         }
 
         public bool GetForceAlign() => _ribbon.Config.ForceAlign;
