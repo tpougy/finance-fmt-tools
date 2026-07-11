@@ -106,5 +106,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Format Engine Core | 3/3 | Complete | 2026-07-11 |
 | 2. Abstractions & Orchestration | 2/2 | Complete | 2026-07-11 |
 | 3. COM Entry Point & Real Excel Integration | 2/2 | Code complete (live-Excel smoke test `human_needed`) | 2026-07-11 |
-| 4. Installation & Registration | 3/3 | Code complete (live install/uninstall test `human_needed`) | 2026-07-11 |
+| 4. Installation & Registration | 3/3 | Code complete — verified (live install/uninstall test `human_needed`) | 2026-07-11 |
 | 5. CI/CD Pipeline & Release Runbook | 0/TBD | Not started | - |

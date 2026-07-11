@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-03-PLAN.md (Phase 4 code complete, 3/3 plans — live install/uninstall test deferred as human_needed)
-last_updated: "2026-07-11T14:45:00-03:00"
-last_activity: 2026-07-11 -- Phase 4 code complete
+stopped_at: Phase 4 verified (04-VERIFICATION.md, status human_needed — same class as Phase 3). Starting Phase 5.
+last_updated: "2026-07-11T18:15:00-03:00"
+last_activity: 2026-07-11 -- Phase 4 complete, starting Phase 5
 progress:
   total_phases: 5
   completed_phases: 2
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-10)
 
 **Core value:** Aplicar formatos financeiros/contábeis padronizados a células do Excel com um clique — agora sobre uma base de código C# testável, com dev/build/release 100% via terminal.
-**Current focus:** Phase 4 — Installation & Registration (code complete; live install/uninstall verification pending)
+**Current focus:** Phase 5 — CI/CD Pipeline & Release Runbook (starting)
 
 ## Current Position
 
-Phase: 4 (Installation & Registration) — CODE COMPLETE, plans 3/3 done
-Plan: 3 of 3 — complete (live install/uninstall/idempotency/Resiliency checklist recorded as `human_needed`, precondition `dotnet build` verified green)
-Next: Phase 4 code review (`scripts/*.ps1`), then Phase 4 VERIFICATION.md (expect `human_needed`, mirroring Phase 3), then Phase 5 (CI/CD Pipeline & Release Runbook) — needs context/research/plan-phase
-Status: Phase 3 and Phase 4 are both code-complete/human_needed (unchanged for Phase 3; Phase 4 newly reached this state). Not executable end-to-end in this Linux/WSL environment (no Windows/Excel/registry) — live install/uninstall behavior deferred to 04-03-SUMMARY.md's itemized checklist.
+Phase: 4 (Installation & Registration) — COMPLETE (code review fixed 8/9 findings, VERIFICATION.md recorded `human_needed`, same class as Phase 3)
+Plan: N/A — Phase 4 fully closed out
+Next: Phase 5 (CI/CD Pipeline & Release Runbook) — needs context/research/plan-phase, then execution, review, verification
+Status: Phase 3 and Phase 4 are both code-complete/human_needed (live Excel/Windows verification outstanding for both, itemized checklists recorded). Phase 5 has not started.
 Last activity: 2026-07-11
 
 Progress: [████████████░] 95%
