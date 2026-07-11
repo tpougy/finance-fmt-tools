@@ -61,7 +61,11 @@ Plans:
   3. Toggling "Alinhar à direita" changes the alignment of subsequently-applied formats during the session, starts unchecked every time Excel opens, and never persists across Excel restarts (RIB-02)
   4. Toggling "Zero contábil" changes the accounting format's zero-display behavior during the session, starts checked every time Excel opens, and never persists across Excel restarts (RIB-03)
   5. Clicking "Sobre" on the Ribbon shows an About message with version info, and the documentation-link button opens the correct docs URL (RIB-04)
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Bootstrap FinanceFmtTools.ComAddin (net48-only) + hand-rolled Extensibility shim + real IExcelGateway/IRangeHandle/ILog implementations (RIB-01 foundation)
+- [ ] 03-02-PLAN.md — Connect.cs (COM entry point, all 17 Ribbon callbacks) + AddInHost composition root + live Excel smoke test checklist (RIB-01, RIB-02, RIB-03, RIB-04)
 **UI hint**: yes
 
 ### Phase 4: Installation & Registration
@@ -96,6 +100,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Format Engine Core | 3/3 | Complete | 2026-07-11 |
 | 2. Abstractions & Orchestration | 2/2 | Complete | 2026-07-11 |
-| 3. COM Entry Point & Real Excel Integration | 0/TBD | Not started | - |
+| 3. COM Entry Point & Real Excel Integration | 0/2 | Not started | - |
 | 4. Installation & Registration | 0/TBD | Not started | - |
 | 5. CI/CD Pipeline & Release Runbook | 0/TBD | Not started | - |
