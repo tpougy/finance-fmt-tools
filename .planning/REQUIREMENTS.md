@@ -14,7 +14,7 @@ Full-parity migration from VBA to C#. No staged rollout — every requirement be
 - [x] **FMT-03**: Botão "Spread (bps)" aplica o formato de spread em basis points
 - [x] **FMT-04**: Botões "Date ISO", "Date BR" e "Date BR Longa" aplicam os formatos de data correspondentes, com meses em português independente do idioma da interface do Excel
 - [x] **FMT-05**: Botões "Integer" e "Text" aplicam os formatos correspondentes
-- [ ] **FMT-06**: Aplicar um formato com uma seleção inválida (Chart/Shape em vez de Range) mostra uma mensagem amigável em vez de quebrar o add-in
+- [x] **FMT-06**: Aplicar um formato com uma seleção inválida (Chart/Shape em vez de Range) mostra uma mensagem amigável em vez de quebrar o add-in
 - [x] **FMT-07**: O format engine (equivalente ao `AccountingFmt`) tem cobertura de testes xUnit para as 16 combinações, executável via `dotnet test` sem Excel instalado
 
 ### Ribbon & Checkboxes
@@ -78,7 +78,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FMT-03 | Phase 1 - Format Engine Core | Complete |
 | FMT-04 | Phase 1 - Format Engine Core | Complete |
 | FMT-05 | Phase 1 - Format Engine Core | Complete |
-| FMT-06 | Phase 2 - Abstractions & Orchestration | Pending |
+| FMT-06 | Phase 2 - Abstractions & Orchestration | Complete |
 | FMT-07 | Phase 1 - Format Engine Core | Complete |
 | RIB-01 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |
 | RIB-02 | Phase 3 - COM Entry Point & Real Excel Integration | Pending |

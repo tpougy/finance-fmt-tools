@@ -48,7 +48,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — IExcelGateway/IRangeHandle/ILog seam + FormatEngine.Apply/ApplyToSelection orchestration, including the FMT-06 invalid-selection guard clause
+- [x] 02-01-PLAN.md — IExcelGateway/IRangeHandle/ILog seam + FormatEngine.Apply/ApplyToSelection orchestration, including the FMT-06 invalid-selection guard clause
 - [ ] 02-02-PLAN.md — RibbonSessionConfig (RIB-02/RIB-03 authoritative defaults) + RibbonController (in-memory checkbox state, embedded customUI14.xml resource loading)
 
 ### Phase 3: COM Entry Point & Real Excel Integration
@@ -95,7 +95,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Format Engine Core | 3/3 | Complete | 2026-07-11 |
-| 2. Abstractions & Orchestration | 0/2 | Planned | - |
+| 2. Abstractions & Orchestration | 1/2 | In Progress | - |
 | 3. COM Entry Point & Real Excel Integration | 0/TBD | Not started | - |
 | 4. Installation & Registration | 0/TBD | Not started | - |
 | 5. CI/CD Pipeline & Release Runbook | 0/TBD | Not started | - |
