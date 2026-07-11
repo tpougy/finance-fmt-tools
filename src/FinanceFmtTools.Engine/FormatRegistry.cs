@@ -9,15 +9,28 @@ namespace FinanceFmtTools.Engine
     // embedded by AccountingFormatBuilder.Build, not from a HorizontalAlignment
     // COM write.
     //
-    // Interim state: only the 7 literal (non-Fin) entries are wired so far.
-    // FormatKeys.Integer/Fin2D/Fin4D/Fin8D currently fall through to `default`
-    // and return false — the next task adds explicit cases for them.
     public static class FormatRegistry
     {
         public static bool TryGetFormatDef(string key, bool forceAlign, bool zeroDash, out FormatDef def)
         {
             switch (key)
             {
+                case FormatKeys.Integer:
+                    def = new FormatDef(key, "Financeiro 0 casas", AccountingFormatBuilder.Build(0, forceAlign, zeroDash), FormatCategory.Numeric, CellAlignment.General);
+                    return true;
+
+                case FormatKeys.Fin2D:
+                    def = new FormatDef(key, "Financeiro 2 casas", AccountingFormatBuilder.Build(2, forceAlign, zeroDash), FormatCategory.Numeric, CellAlignment.General);
+                    return true;
+
+                case FormatKeys.Fin4D:
+                    def = new FormatDef(key, "Financeiro 4 casas", AccountingFormatBuilder.Build(4, forceAlign, zeroDash), FormatCategory.Numeric, CellAlignment.General);
+                    return true;
+
+                case FormatKeys.Fin8D:
+                    def = new FormatDef(key, "Financeiro 8 casas", AccountingFormatBuilder.Build(8, forceAlign, zeroDash), FormatCategory.Numeric, CellAlignment.General);
+                    return true;
+
                 case FormatKeys.Pct4D:
                     def = new FormatDef(key, "% 4 casas", "0.0000%", FormatCategory.Percent, CellAlignment.General);
                     return true;
