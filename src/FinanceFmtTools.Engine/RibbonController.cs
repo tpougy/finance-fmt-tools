@@ -12,7 +12,7 @@ namespace FinanceFmtTools.Engine
 
         public RibbonController(RibbonSessionConfig config)
         {
-            if (config == null) throw new ArgumentNullException("config");
+            if (config == null) throw new ArgumentNullException(nameof(config));
             Config = config;
         }
 
@@ -31,7 +31,14 @@ namespace FinanceFmtTools.Engine
                     break;
                 }
             }
-            if (resourceName == null) return string.Empty;
+            if (resourceName == null)
+            {
+                // Unlike FMT-06's invalid-selection guard, a missing embedded ribbon resource is an
+                // unrecoverable build/packaging defect (e.g. csproj EmbeddedResource entry removed or
+                // renamed) — fail loudly rather than silently returning an empty ribbon XML string
+                // that would render no Finance Fmt tab with zero error trail.
+                throw new InvalidOperationException("Embedded resource 'customUI14.xml' not found in assembly.");
+            }
 
             using (Stream stream = asm.GetManifestResourceStream(resourceName))
             using (StreamReader reader = new StreamReader(stream))

@@ -32,5 +32,18 @@ namespace FinanceFmtTools.Engine.Tests
             Assert.Single(log.Warnings);
             Assert.Empty(log.Infos);
         }
+
+        [Fact]
+        public void Apply_RangeNulo_LogaAvisoENaoLanca()
+        {
+            var log = new SpyLog();
+
+            var ex = Record.Exception(() =>
+                FormatEngine.Apply(null, log, FormatKeys.Fin2D, forceAlign: false, zeroDash: true));
+
+            Assert.Null(ex);
+            Assert.Single(log.Warnings);
+            Assert.Empty(log.Infos);
+        }
     }
 }

@@ -8,6 +8,14 @@ namespace FinanceFmtTools.Engine
     {
         public static void Apply(IRangeHandle range, ILog log, string formatKey, bool forceAlign, bool zeroDash)
         {
+            if (range == null)
+            {
+                // Mirrors VBA's ApplyFormat "If rng Is Nothing" guard (src/modFormatEngine.bas:24-31) —
+                // a defense-in-depth check independent of ApplyToSelection's own selection guard.
+                log.Warn("FormatEngine.Apply: range é null — abortando '" + formatKey + "'.");
+                return;
+            }
+
             if (!FormatRegistry.TryGetFormatDef(formatKey, forceAlign, zeroDash, out FormatDef def))
             {
                 log.Warn("FormatEngine.Apply: chave de formato desconhecida '" + formatKey + "'.");

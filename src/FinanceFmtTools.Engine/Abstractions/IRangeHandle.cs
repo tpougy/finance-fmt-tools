@@ -1,5 +1,6 @@
-// Needs "using FinanceFmtTools.Engine;" for CellAlignment — child namespaces do not
-// automatically see the parent namespace's types in C#.
+// Kept explicit for readability/clarity, even though C#'s namespace lookup already
+// resolves CellAlignment (declared in the enclosing FinanceFmtTools.Engine namespace)
+// without this using directive.
 using FinanceFmtTools.Engine;
 
 namespace FinanceFmtTools.Engine.Abstractions
