@@ -1,0 +1,60 @@
+# Source: outlook-classic-delay-send/.github/workflows/release.yml (verified working,
+# gh run view 28721027038, 2026-07-04/05), adapted for FinanceFmtTools's fixed-name zip.
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Restore
+        run: dotnet restore src\FinanceFmtTools.sln
+
+      - name: Build
+        run: dotnet build src\FinanceFmtTools.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test src\FinanceFmtTools.Engine.Tests\FinanceFmtTools.Engine.Tests.csproj -c Release --no-build
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $binSrc = "src\FinanceFmtTools.ComAddin\bin\Release\net48"
+          New-Item -ItemType Directory -Path staging -Force | Out-Null
+
+          Copy-Item "$binSrc\FinanceFmtTools.ComAddin.dll"       staging\
+          Copy-Item "$binSrc\FinanceFmtTools.Engine.dll"         staging\
+          Copy-Item "$binSrc\Microsoft.Office.Interop.Excel.dll" staging\
+          Copy-Item "$binSrc\office.dll"                         staging\
+          Copy-Item scripts\install.ps1            staging\
+          Copy-Item scripts\uninstall.ps1          staging\
+          Copy-Item scripts\verify-environment.ps1 staging\
+
+          # FIXED literal name -- scripts/install.ps1's $AssetName constant and its
+          # ".../releases/latest/download/FinanceFmtTools.zip" URL depend on this exact
+          # filename never changing between releases (unlike a per-tag-versioned name).
+          Compress-Archive -Path staging\* -DestinationPath FinanceFmtTools.zip -Force
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Finance Fmt Tools ${{ github.ref_name }}
+          body_path: RELEASE_NOTES.md
+          files: FinanceFmtTools.zip
