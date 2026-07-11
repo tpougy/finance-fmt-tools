@@ -37,8 +37,8 @@ Full-parity migration from VBA to C#. No staged rollout — every requirement be
 ### CI/CD & Release
 
 - [ ] **REL-01**: Um push de tag `v*.*.*` dispara um workflow do GitHub Actions que compila, testa, empacota e publica a release automaticamente
-- [ ] **REL-02**: Existe um runbook documentado com comandos `gh` para criar uma release manualmente (executável por uma pessoa ou por um agente de IA), sem depender do CI
-- [ ] **REL-03**: Cada release publicada inclui notas de changelog descrevendo o que mudou
+- [x] **REL-02**: Existe um runbook documentado com comandos `gh` para criar uma release manualmente (executável por uma pessoa ou por um agente de IA), sem depender do CI
+- [x] **REL-03**: Cada release publicada inclui notas de changelog descrevendo o que mudou
 
 ### Legado VBA
 
@@ -89,8 +89,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INST-02 | Phase 4 - Installation & Registration | Code complete — human_needed (live install/uninstall test) |
 | INST-03 | Phase 4 - Installation & Registration | Code complete — human_needed (live install/uninstall test) |
 | REL-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
-| REL-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
-| REL-03 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
+| REL-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Complete |
+| REL-03 | Phase 5 - CI/CD Pipeline & Release Runbook | Complete |
 | LEGACY-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
 | LEGACY-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
 
