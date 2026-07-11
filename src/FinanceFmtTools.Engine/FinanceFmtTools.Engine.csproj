@@ -14,4 +14,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="../customUI14.xml" Link="Resources/customUI14.xml" />
+  </ItemGroup>
+
 </Project>
