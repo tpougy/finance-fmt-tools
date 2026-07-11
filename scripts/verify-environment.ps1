@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Auditoria de ambiente (somente leitura) para o projeto Finance Fmt Tools (C#).
 
@@ -76,6 +76,8 @@ function Write-Status {
 function Test-PeMachine {
     # Retorna 'x64', 'x86' ou uma string hex; lê o cabeçalho PE do executável.
     param([string]$Path)
+    $fs = $null
+    $br = $null
     try {
         $fs = [System.IO.File]::OpenRead($Path)
         $br = New-Object System.IO.BinaryReader($fs)
@@ -83,7 +85,6 @@ function Test-PeMachine {
         $peOff = $br.ReadInt32()
         $fs.Seek($peOff + 4, 'Begin') | Out-Null
         $machine = $br.ReadUInt16()
-        $br.Close(); $fs.Close()
         switch ($machine) {
             0x8664 { return 'x64' }
             0x14c  { return 'x86' }
@@ -91,6 +92,9 @@ function Test-PeMachine {
         }
     } catch {
         return 'desconhecido'
+    } finally {
+        if ($br) { $br.Dispose() }
+        if ($fs) { $fs.Dispose() }
     }
 }
 

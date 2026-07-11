@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Desinstalador do add-in COM "Finance Fmt Tools" (C# / Excel).
@@ -64,15 +64,22 @@ function Assert-ExcelNotRunning {
     }
 
     if ($Force) {
-        Write-Warn2 'Excel está aberto. -Force informado: tentando fechar com segurança...'
+        # NUNCA forca o encerramento do processo (Stop-Process): CloseMainWindow() pode
+        # abrir um dialogo nativo "Salvar alteracoes?" para QUALQUER pasta de trabalho
+        # aberta, nao so a deste desinstalador. Matar o processo descartaria esse diálogo
+        # e o trabalho não salvo do usuário. Em vez disso, aguarda até 30s pelo fechamento
+        # espontâneo e falha com uma mensagem acionável se o Excel continuar aberto.
+        Write-Warn2 'Excel está aberto. -Force informado: solicitando fechamento (até 30s)...'
         try {
             $excelProcs | ForEach-Object { $_.CloseMainWindow() | Out-Null }
-            Start-Sleep -Seconds 3
-            $excelProcs = Get-Process -Name 'EXCEL' -ErrorAction SilentlyContinue
+            for ($i = 0; $i -lt 30; $i++) {
+                Start-Sleep -Seconds 1
+                $excelProcs = Get-Process -Name 'EXCEL' -ErrorAction SilentlyContinue
+                if (-not $excelProcs) { break }
+            }
             if ($excelProcs) {
-                Write-Warn2 'Excel não fechou sozinho; encerrando o processo (-Force)...'
-                $excelProcs | Stop-Process -Force -ErrorAction Stop
-                Start-Sleep -Seconds 2
+                Write-Err2 'Excel ainda está aberto (pode haver um diálogo "Salvar alterações?" pendente). Salve seu trabalho, feche o Excel manualmente e rode o desinstalador novamente.'
+                exit 1
             }
             Write-Ok 'Excel fechado.'
         } catch {
@@ -107,57 +114,67 @@ Write-Host '############################################################' -Foreg
 Write-Step 'Pré-remoção'
 Assert-ExcelNotRunning
 
-# ===========================================================================
-# PASSO 2 - Remover as 3 árvores de registro (HKCU)
-# ===========================================================================
-Write-Step 'Removendo chaves de registro (HKCU)'
+try {
+    # ===========================================================================
+    # PASSO 2 - Remover as 3 árvores de registro (HKCU)
+    # ===========================================================================
+    Write-Step 'Removendo chaves de registro (HKCU)'
 
-# (a) Classe COM: CLSID (inclui ProgId + InprocServer32 como filhos) + ProgId->CLSID
-Remove-KeyIfExists -Path "HKCU:\Software\Classes\CLSID\$Guid"
-Remove-KeyIfExists -Path "HKCU:\Software\Classes\$ProgId"
+    # (a) Classe COM: CLSID (inclui ProgId + InprocServer32 como filhos) + ProgId->CLSID
+    Remove-KeyIfExists -Path "HKCU:\Software\Classes\CLSID\$Guid"
+    Remove-KeyIfExists -Path "HKCU:\Software\Classes\$ProgId"
 
-# (b) Descoberta pelo Excel (NÃO versionado)
-Remove-KeyIfExists -Path "HKCU:\Software\Microsoft\Office\Excel\Addins\$ProgId"
+    # (b) Descoberta pelo Excel (NÃO versionado)
+    Remove-KeyIfExists -Path "HKCU:\Software\Microsoft\Office\Excel\Addins\$ProgId"
 
-# (c) Resiliência: remover apenas o VALOR do ProgId — a chave DoNotDisableAddinList
-# pode conter valores de outros add-ins e NUNCA deve ser removida por inteiro.
-$kResil = "HKCU:\Software\Microsoft\Office\$OfficeVerKey\Excel\Resiliency\DoNotDisableAddinList"
-if (Test-Path $kResil) {
-    $prop = Get-ItemProperty -Path $kResil -Name $ProgId -ErrorAction SilentlyContinue
-    if ($null -ne $prop -and $null -ne $prop.$ProgId) {
-        Remove-ItemProperty -Path $kResil -Name $ProgId -Force -ErrorAction Stop
-        Write-Ok ("Removido valor de resiliência: {0}\{1}" -f $kResil, $ProgId)
-    } else {
-        Write-Info ("Valor de resiliência já ausente: {0}\{1}" -f $kResil, $ProgId)
-    }
-} else {
-    Write-Info ("Chave de resiliência já ausente: {0}" -f $kResil)
-}
-
-# ===========================================================================
-# PASSO 3 - Remover arquivos instalados
-# ===========================================================================
-Write-Step 'Removendo arquivos instalados'
-
-if (Test-Path $InstallDir) {
-    foreach ($f in $AllFiles) {
-        $p = Join-Path $InstallDir $f
-        if (Test-Path $p) {
-            Remove-Item -Path $p -Force -ErrorAction Stop
-            Write-Ok ("Removido: {0}" -f $f)
+    # (c) Resiliência: remover apenas o VALOR do ProgId — a chave DoNotDisableAddinList
+    # pode conter valores de outros add-ins e NUNCA deve ser removida por inteiro.
+    $kResil = "HKCU:\Software\Microsoft\Office\$OfficeVerKey\Excel\Resiliency\DoNotDisableAddinList"
+    if (Test-Path $kResil) {
+        $prop = Get-ItemProperty -Path $kResil -Name $ProgId -ErrorAction SilentlyContinue
+        if ($null -ne $prop -and $null -ne $prop.$ProgId) {
+            Remove-ItemProperty -Path $kResil -Name $ProgId -Force -ErrorAction Stop
+            Write-Ok ("Removido valor de resiliência: {0}\{1}" -f $kResil, $ProgId)
         } else {
-            Write-Info ("Já ausente: {0}" -f $f)
+            Write-Info ("Valor de resiliência já ausente: {0}\{1}" -f $kResil, $ProgId)
         }
+    } else {
+        Write-Info ("Chave de resiliência já ausente: {0}" -f $kResil)
     }
-    # Remove a pasta de instalação somente se ficou vazia (nunca um delete em bloco —
-    # arquivos não listados podem ter sido colocados ali manualmente).
-    $resto = Get-ChildItem -Path $InstallDir -Force -ErrorAction SilentlyContinue
-    if (-not $resto) {
-        Remove-Item -Path $InstallDir -Force -ErrorAction SilentlyContinue
-        Write-Info ("Pasta de instalação vazia removida: {0}" -f $InstallDir)
+
+    # ===========================================================================
+    # PASSO 3 - Remover arquivos instalados
+    # ===========================================================================
+    Write-Step 'Removendo arquivos instalados'
+
+    # Reconfere que o Excel continua fechado imediatamente antes de remover
+    # arquivos — evita um file-lock silencioso caso o usuário tenha reaberto o
+    # Excel entre a checagem inicial (Passo 1) e este ponto (TOCTOU).
+    Assert-ExcelNotRunning
+
+    if (Test-Path $InstallDir) {
+        foreach ($f in $AllFiles) {
+            $p = Join-Path $InstallDir $f
+            if (Test-Path $p) {
+                Remove-Item -Path $p -Force -ErrorAction Stop
+                Write-Ok ("Removido: {0}" -f $f)
+            } else {
+                Write-Info ("Já ausente: {0}" -f $f)
+            }
+        }
+        # Remove a pasta de instalação somente se ficou vazia (nunca um delete em bloco —
+        # arquivos não listados podem ter sido colocados ali manualmente).
+        $resto = Get-ChildItem -Path $InstallDir -Force -ErrorAction SilentlyContinue
+        if (-not $resto) {
+            Remove-Item -Path $InstallDir -Force -ErrorAction SilentlyContinue
+            Write-Info ("Pasta de instalação vazia removida: {0}" -f $InstallDir)
+        }
+    } else {
+        Write-Info ("Pasta de instalação já ausente: {0}" -f $InstallDir)
     }
-} else {
-    Write-Info ("Pasta de instalação já ausente: {0}" -f $InstallDir)
+} catch {
+    Write-Err2 ("Falha durante a desinstalação (registro ou arquivos): {0}" -f $_.Exception.Message)
+    exit 1
 }
 
 # ===========================================================================

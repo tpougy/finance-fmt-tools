@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Instala o add-in COM "Finance Fmt Tools" (C# / Excel) no Excel 64-bit. Uso do USUARIO FINAL.
@@ -70,7 +70,8 @@ $ErrorActionPreference = 'Stop'
 $Guid         = '{881EFDF3-424C-4240-BCA0-714DAC2B9CD7}'
 $ProgId       = 'FinanceFmtTools.Connect'
 $ClassName    = 'FinanceFmtTools.ComAddin.Connect'
-$AssemblyStr  = 'FinanceFmtTools.ComAddin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'
+# $AssemblyStr NAO e' um literal fixo aqui: e' lido do próprio DLL copiado (via
+# System.Reflection.AssemblyName), para nunca ficar dessincronizado de um bump de versão.
 $RuntimeVer   = 'v4.0.30319'
 $Shim         = 'C:\Windows\System32\mscoree.dll'
 $ThreadingMdl = 'Both'
@@ -123,15 +124,22 @@ function Assert-ExcelNotRunning {
     }
 
     if ($Force) {
-        Write-Warn2 'Excel está aberto. -Force informado: tentando fechar com segurança...'
+        # NUNCA forca o encerramento do processo (Stop-Process): CloseMainWindow() pode
+        # abrir um dialogo nativo "Salvar alteracoes?" para QUALQUER pasta de trabalho
+        # aberta, nao so a deste instalador. Matar o processo descartaria esse diálogo e
+        # o trabalho não salvo do usuário. Em vez disso, aguarda até 30s pelo fechamento
+        # espontâneo e falha com uma mensagem acionável se o Excel continuar aberto.
+        Write-Warn2 'Excel está aberto. -Force informado: solicitando fechamento (até 30s)...'
         try {
             $excelProcs | ForEach-Object { $_.CloseMainWindow() | Out-Null }
-            Start-Sleep -Seconds 3
-            $excelProcs = Get-Process -Name 'EXCEL' -ErrorAction SilentlyContinue
+            for ($i = 0; $i -lt 30; $i++) {
+                Start-Sleep -Seconds 1
+                $excelProcs = Get-Process -Name 'EXCEL' -ErrorAction SilentlyContinue
+                if (-not $excelProcs) { break }
+            }
             if ($excelProcs) {
-                Write-Warn2 'Excel não fechou sozinho; encerrando o processo (-Force)...'
-                $excelProcs | Stop-Process -Force -ErrorAction Stop
-                Start-Sleep -Seconds 2
+                Write-Err2 'Excel ainda está aberto (pode haver um diálogo "Salvar alterações?" pendente). Salve seu trabalho, feche o Excel manualmente e rode o instalador novamente.'
+                exit 1
             }
             Write-Ok 'Excel fechado.'
         } catch {
@@ -148,6 +156,8 @@ function Assert-ExcelNotRunning {
 # Le o cabecalho PE (MS-DOS/COFF) e retorna 'x64' / 'x86' / hex / 'desconhecido'.
 function Test-PeMachine {
     param([string]$Path)
+    $fs = $null
+    $br = $null
     try {
         $fs = [System.IO.File]::OpenRead($Path)
         $br = New-Object System.IO.BinaryReader($fs)
@@ -155,13 +165,17 @@ function Test-PeMachine {
         $peOff = $br.ReadInt32()
         $fs.Seek($peOff + 4, 'Begin') | Out-Null
         $machine = $br.ReadUInt16()
-        $br.Close(); $fs.Close()
         switch ($machine) {
             0x8664  { 'x64' }
             0x14c   { 'x86' }
             default { ('0x{0:X}' -f $machine) }
         }
-    } catch { 'desconhecido' }
+    } catch {
+        'desconhecido'
+    } finally {
+        if ($br) { $br.Dispose() }
+        if ($fs) { $fs.Dispose() }
+    }
 }
 
 # Usado so para a mensagem amigavel "baixando versao X" — o $DownloadUrl em si
@@ -180,7 +194,11 @@ function Find-BinDir {
     if (Test-Path (Join-Path $Root $DllName)) { return (Resolve-Path $Root).Path }
     $directBin = Join-Path $Root 'bin'
     if (Test-Path (Join-Path $directBin $DllName)) { return (Resolve-Path $directBin).Path }
-    $hit = Get-ChildItem -Path $Root -Recurse -Filter $DllName -File -ErrorAction SilentlyContinue | Select-Object -First 1
+    # Prioriza matches sob "\bin\" quando ha mais de um (ex.: build SDK-style tambem
+    # deixa uma cópia em obj\) — evita instalar um artefato intermediario obsoleto.
+    $hit = Get-ChildItem -Path $Root -Recurse -Filter $DllName -File -ErrorAction SilentlyContinue |
+        Sort-Object { $_.FullName -notmatch '\\bin\\' } |
+        Select-Object -First 1
     if ($hit) { return $hit.DirectoryName }
     return $null
 }
@@ -339,6 +357,11 @@ Write-Step 'Instalação'
 $valOk = $true
 
 try {
+    # Reconfere que o Excel continua fechado imediatamente antes de tocar em
+    # arquivos — o download/extração acima pode ter levado tempo suficiente
+    # para o usuário reabrir o Excel desde a checagem inicial (TOCTOU).
+    Assert-ExcelNotRunning
+
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
     Write-Ok ("Pasta de instalação pronta: {0}" -f $InstallDir)
 
@@ -350,7 +373,13 @@ try {
     }
 
     $dllPath  = Join-Path $InstallDir $DllName
-    $codeBase = 'file:///' + ($dllPath -replace '\\', '/')
+    # [Uri]::AbsoluteUri percent-codifica caracteres especiais (ex.: espaços em
+    # "C:\Users\Nome Completo\...", comuns em máquinas corporativas) — uma
+    # concatenação manual de string deixaria o CodeBase inválido nesses casos.
+    $codeBase = ([Uri]$dllPath).AbsoluteUri
+    # $AssemblyStr é lido do DLL recém-copiado, não hardcoded, para nunca ficar
+    # dessincronizado de um bump de versão do assembly.
+    $AssemblyStr = [System.Reflection.AssemblyName]::GetAssemblyName($dllPath).FullName
 
     Write-Step 'Registrando em HKCU (sem admin)'
 
@@ -393,6 +422,9 @@ try {
     New-Item -Path $kResil -Force | Out-Null
     Set-ItemProperty -Path $kResil -Name $ProgId -Value 1 -Type DWord
     Write-Ok 'Chave de resiliência (DoNotDisableAddinList) criada.'
+} catch {
+    Write-Err2 ("Falha durante a instalação (cópia de arquivos ou registro): {0}" -f $_.Exception.Message)
+    exit 1
 } finally {
     Remove-TempExtract
 }
