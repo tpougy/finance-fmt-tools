@@ -390,22 +390,16 @@ if ($cb -eq $codeBase) { Write-Ok ("CodeBase correto: {0}" -f $cb) }
 | A2 | 32-bit Excel would very likely still load this AnyCPU add-in via the same HKCU keys (the project defers 32-bit *support/testing*, not necessarily technical incompatibility) | User Constraints / Claude's Discretion | Low risk — this is an informational note for the planner's bitness-guard design choice, not a functional claim this phase depends on (project scope is 64-bit only regardless) |
 | A3 | `FriendlyName` value of `Finance Fmt Tools` (matching `AddInHost.cs`'s `AddinName` constant) is the right value to register, as opposed to `Finance Fmt` (the Ribbon tab's own label) | Standard Stack / User Constraints | Low risk — cosmetic only, affects what's shown in Excel's "COM Add-ins" dialog, not functional behavior; easy to change later without any migration concern since it's a REG_SZ value, not an identity key |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does the Resiliency `DoNotDisableAddinList` key structurally and behaviorally apply to Excel exactly as documented for Outlook?**
-   - What we know: The path shape generalizes trivially and KB 2758876's applies-to metadata (per WebSearch synthesis) lists Excel 2016/2013 as covered; multiple community sources (blog posts, the sibling project's own working Outlook implementation of the same underlying resiliency subsystem) corroborate the pattern.
-   - What's unclear: Microsoft's own rendered documentation page is Outlook-specific in URL/namespace, and one (uncorroborated, single) Microsoft Q&A answer explicitly disputes Excel/Word applicability.
-   - Recommendation: Write the key regardless (low cost, well-formed, best current understanding) and add an explicit live-Excel test to this phase's verification checklist: deliberately trigger a slow/crashing load once, confirm Excel's next launch does NOT show the "add-in was disabled" notification.
+1. **RESOLVED — Does the Resiliency `DoNotDisableAddinList` key structurally and behaviorally apply to Excel exactly as documented for Outlook?**
+   - RESOLVED: Write the key regardless (low cost, well-formed, best current understanding per KB 2758876). Add an explicit item to this phase's human-verification checklist: deliberately trigger a slow/crashing load once, confirm Excel's next launch does NOT show the "add-in was disabled" notification.
 
-2. **Can this phase's installer be meaningfully tested before Phase 5 produces a real release asset?**
-   - What we know: `gh release list` confirms only legacy `.xlam` releases (`v1.0.0`, `v1.0.1`) exist today; no C# release exists yet, so the documented one-liner's GitHub-download step has nothing real to download against.
-   - What's unclear: Whether the planner wants Phase 4's own verification to be blocked on Phase 5, or resolved via the `-Package`/`-Source` local-testing escape hatch (Pattern 2) using a manually-built-and-zipped `bin\` folder from this repo's own already-working `dotnet build` output.
-   - Recommendation: Use the local-testing escape hatch — this phase's own verification can exercise 100% of the registration logic (Pattern 1) against a locally-built zip without waiting on Phase 5, and should say so explicitly rather than silently deferring everything to `human_needed`.
+2. **RESOLVED — Can this phase's installer be meaningfully tested before Phase 5 produces a real release asset?**
+   - RESOLVED: Use the local-testing escape hatch (`-Package`/`-Source` flags, Pattern 2) against a manually zipped, locally `dotnet build`-produced `bin\` folder. This phase's plans must include this escape hatch explicitly, not silently defer everything to `human_needed`.
 
-3. **Should the installer detect and warn about a still-installed legacy `.xlam` add-in (potential dual-Ribbon-tab conflict)?**
-   - What we know: The legacy `.xlam` add-in's Ribbon tab is also labeled "Finance Fmt" (identical label — see `src/customUI14.xml`); if a user has both the old `.xlam` and the new COM add-in loaded simultaneously, Excel would show two visually-identical "Finance Fmt" tabs, which could confuse the user during any transition window.
-   - What's unclear: Whether this transition-period UX concern is in scope for Phase 4 (which only handles the new C# add-in's own install/uninstall) or is implicitly Phase 5's job (LEGACY-01/02 formally retires the VBA flow).
-   - Recommendation: Out of scope for INST-01/02/03's literal requirements; flag for the planner as an optional nice-to-have (e.g., a post-install informational message noting the old `.xlam` should be manually removed from `%APPDATA%\Microsoft\AddIns` if present) rather than a blocking requirement.
+3. **RESOLVED — Should the installer detect and warn about a still-installed legacy `.xlam` add-in (potential dual-Ribbon-tab conflict)?**
+   - RESOLVED: Out of scope for this phase's INST-01/02/03 requirements — do not add active detection/warning logic. This is documentation/UX territory better owned by Phase 5's LEGACY-01/02 (formal VBA retirement), not a Phase 4 installer behavior.
 
 ## Environment Availability
 
