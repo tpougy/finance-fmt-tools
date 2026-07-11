@@ -532,14 +532,16 @@ uuidgen
 
 **If this table is empty:** N/A — five assumptions logged above; all directly investigable by the user reviewing the licensing tradeoff (A1) or by the live-Excel smoke test (A2-A5).
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does the checkbox visually refresh correctly without `InvalidateControl` (matching VBA's actual, already-shipped behavior), or is `InvalidateControl` genuinely required?**
+1. **RESOLVED — Does the checkbox visually refresh correctly without `InvalidateControl` (matching VBA's actual, already-shipped behavior), or is `InvalidateControl` genuinely required?**
+   - RESOLVED: Implement the defensive version (cache `IRibbonUI` + call `InvalidateControl` on checkbox toggle, Pattern 4) — costs nothing, removes ambiguity. Included explicitly in the human_needed smoke-test checklist regardless.
    - What we know: VBA's `modRibbon.bas` never calls `mRibbon.InvalidateControl` anywhere, and the VBA add-in has shipped as `v1.0.0`/`v1.0.1` — implying the native checkbox toggle either self-refreshes or the discrepancy was never noticed/reported.
    - What's unclear: Community forum sources genuinely disagree on whether Excel's checkbox control needs an explicit invalidate to reflect its own `getPressed` state after its own `onAction` fires.
    - Recommendation: Implement the defensive version (cache + invalidate, Pattern 4) since it costs nothing and removes the ambiguity — but include this specific behavior explicitly in the `human_needed` smoke-test checklist regardless.
 
-2. **Will the `Microsoft.Office.Interop.Excel`/`MicrosoftOfficeCore16` (CamronBute) NuGet packages actually load correctly at runtime against the user's specific installed Excel version, given they are unofficial repackages?**
+2. **RESOLVED — Will the `Microsoft.Office.Interop.Excel`/`MicrosoftOfficeCore16` (CamronBute) NuGet packages actually load correctly at runtime against the user's specific installed Excel version, given they are unofficial repackages?**
+   - RESOLVED: Treated as part of the human_needed live-Excel verification scope, not a build-time blocker — this phase's plans proceed with these packages for compilation.
    - What we know: Content verified this session to contain the genuine, complete Excel/Office Core Object Model (matching official Microsoft Learn API documentation for `Application`/`Range`/`IRibbonExtensibility`/etc.), and the packages are versioned to match Office 16.0 (Excel 2016+, matching CLAUDE.md's stated minimum version).
    - What's unclear: Whether there are any subtle binary-compatibility differences between this repackaged PIA and the "real" PIA that would only manifest at runtime against a specific installed Excel build — this cannot be tested without a live Excel session.
    - Recommendation: Treat this as part of the `human_needed` live-Excel verification scope, not a build-time concern.
