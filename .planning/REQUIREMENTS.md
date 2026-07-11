@@ -42,8 +42,8 @@ Full-parity migration from VBA to C#. No staged rollout — every requirement be
 
 ### Legado VBA
 
-- [ ] **LEGACY-01**: O código-fonte VBA está preservado na branch `archive/vba-legacy` e removido do fluxo de release ativo do `main`
-- [ ] **LEGACY-02**: README e instruções de instalação apontam apenas para o novo add-in em C#
+- [x] **LEGACY-01**: O código-fonte VBA está preservado na branch `archive/vba-legacy` e removido do fluxo de release ativo do `main`
+- [x] **LEGACY-02**: README e instruções de instalação apontam apenas para o novo add-in em C#
 
 ## v2 Requirements
 
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REL-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
 | REL-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Complete |
 | REL-03 | Phase 5 - CI/CD Pipeline & Release Runbook | Complete |
-| LEGACY-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
-| LEGACY-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
+| LEGACY-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Complete |
+| LEGACY-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Complete |
 
 **Coverage:**
 - v1 requirements: 20 total (corrected — Format Engine section has 7 items, FMT-01..07; previous count of 19 was an off-by-one error)

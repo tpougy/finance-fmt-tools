@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 4 verified (04-VERIFICATION.md, status human_needed — same class as Phase 3). Starting Phase 5.
-last_updated: "2026-07-11T18:15:00-03:00"
-last_activity: 2026-07-11 -- Phase 4 complete, starting Phase 5
+status: verifying
+stopped_at: "Completed 05-03-PLAN.md (LEGACY-01/LEGACY-02: VBA source archived off main, README.md rewritten for C# add-in only)"
+last_updated: "2026-07-11T18:42:17.331Z"
+last_activity: 2026-07-11
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
-  percent: 40
+  completed_phases: 4
+  total_plans: 14
+  completed_plans: 13
+  percent: 80
 ---
 
 # Project State
@@ -31,7 +31,7 @@ Next: Phase 5 (CI/CD Pipeline & Release Runbook) — needs context/research/plan
 Status: Phase 3 and Phase 4 are both code-complete/human_needed (live Excel/Windows verification outstanding for both, itemized checklists recorded). Phase 5 has not started.
 Last activity: 2026-07-11
 
-Progress: [████████████░] 95%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [████████████░] 95%
 
 *Updated after each plan completion*
 | Phase 03 P01 | 25 min | 3 tasks | 6 files |
+| Phase 05 P03 | 25 min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,7 @@ Recent decisions affecting current work:
 - [Phase 04, Plan 02]: Wrote `scripts/uninstall.ps1` (176 lines, INST-02) and `scripts/verify-environment.ps1` (279 lines, discretionary read-only diagnostic), both directly in the main conversation for the same recovery reason as Plan 01. `uninstall.ps1` removes all 3 HKCU registry trees `install.ps1` writes — CLSID subtree, ProgId mapping, non-versioned Excel discovery key via `Remove-KeyIfExists`, plus the Resiliency value via `Remove-ItemProperty` only (never deletes the shared `DoNotDisableAddinList` parent key) — and the 4 installed files, exiting 0 unconditionally except when Excel is running without `-Force`. No `-RemoveLogs` concept exists (unlike the sibling project) since `TraceLog` writes via `System.Diagnostics.Trace`, not to a file. All plan-embedded grep checks pass for both files.
 - [Phase 04, Plan 03]: Task 1 is a `checkpoint:human-verify gate="blocking"` requiring a real Windows+Excel machine. Ran the one automatable precondition (`dotnet build src/FinanceFmtTools.sln -c Release` — 0 Warning(s)/0 Error(s)) and confirmed all 4 files `install.ps1`/`uninstall.ps1` expect (`FinanceFmtTools.ComAddin.dll`, `FinanceFmtTools.Engine.dll`, `Microsoft.Office.Interop.Excel.dll`, `office.dll`) exist in the build output. The live install/uninstall/idempotency/Resiliency-behavior checklist itself (8 steps) is recorded verbatim in `04-03-SUMMARY.md` as an explicit `human_needed` item — not approved, faked, or assumed — mirroring Phase 3's identical precedent exactly. **Phase 4 (Installation & Registration) is now code-complete (3/3 plans)**, same status class as Phase 3.
 - [Phase 04 code review]: Fixed 1 critical + 8 of 9 remaining warnings/info findings directly in `scripts/install.ps1`/`uninstall.ps1`/`verify-environment.ps1`: CR-01 (`-Force` could `Stop-Process` Excel after only a 3s grace period, discarding an unrelated unsaved-workbook "Save changes?" dialog — replaced with a 30s polling wait that fails safely with an actionable message instead of ever force-killing); WR-01 (`CodeBase` built via naive string concat instead of `[Uri]::AbsoluteUri`, which would produce an invalid unescaped URI for install paths containing spaces, e.g. `C:\Users\John Smith\...`); WR-03 (`$AssemblyStr` was a hand-maintained literal — now derived from the actually-copied DLL via `[System.Reflection.AssemblyName]::GetAssemblyName`, so it can't silently rot on a version bump); WR-04 (added a second `Assert-ExcelNotRunning` call immediately before `Copy-Item`/`Remove-Item` in both scripts — TOCTOU gap since network download/extraction in `install.ps1` can take real wall-clock time after the upfront check); WR-05 (wrapped the registry-write/file-copy blocks in `try/catch` with friendly `Write-Err2`+`exit 1`, since they previously could throw a raw uncaught exception, contradicting `uninstall.ps1`'s own "exit 0 incondicional" docstring claim); WR-06 (added UTF-8 BOM to all 3 `.ps1` files — without it, Windows PowerShell 5.1's `-File` execution path reads via the legacy ANSI code page, not UTF-8, which would mojibake all the accented Portuguese message strings); IN-02 (fixed a `FileStream`/`BinaryReader` handle leak in `Test-PeMachine`'s exception path, in both `install.ps1` and `verify-environment.ps1`, via `finally { Dispose() }`); IN-03 (`Find-BinDir`'s recursive fallback now prefers `\bin\` paths via `Sort-Object`, avoiding a non-deterministic pick between a real `bin\` output and a stale `obj\` intermediate). **Deliberately deferred (not fixed):** WR-02/IN-01 (extract shared identity constants/helpers into a `scripts/common.ps1`) — `04-02-PLAN.md`'s own Task 1 explicitly states constants must be declared independently ("this script does not source or depend on install.ps1's file") and helpers are "duplicated, not shared — no PowerShell module infrastructure is in scope for this phase," mirroring the sibling project's identical convention; fixing this would override an already-approved planning decision rather than fix a defect. All grep-based structural verify checks re-run and still pass after every fix; no PowerShell interpreter available in this environment to execute the scripts directly.
+- [Phase 05]: [Phase 05, Plan 03]: Removed src/ThisWorkbook.bas, src/modConfig.bas, src/modFormatEngine.bas, src/modRibbon.bas, src/modUtils.bas, Install-FinanceFmtTools.ps1, Install-FinanceFmtTools.bat from main (LEGACY-01), verified fully recoverable via archive/vba-legacy (tip cf2559b); src/customUI14.xml deliberately left untouched (still an active EmbeddedResource in FinanceFmtTools.Engine.csproj) and dotnet build confirmed green after removal. Rewrote README.md for the C# add-in only (LEGACY-02), preserving all user-facing format tables verbatim. No push to origin performed for either main or archive/vba-legacy -- deferred to 05-04's human-authorized checkpoint.
 
 ### Pending Todos
 
@@ -102,6 +104,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-07-11T14:10:00-03:00
-Stopped at: Completed 04-01-PLAN.md (Phase 4 Plan 1 of 3 complete)
+Last session: 2026-07-11T18:42:17.322Z
+Stopped at: Completed 05-03-PLAN.md (LEGACY-01/LEGACY-02: VBA source archived off main, README.md rewritten for C# add-in only)
 Resume file: None
