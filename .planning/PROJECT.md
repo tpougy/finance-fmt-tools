@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Add-in do Excel "Finance Fmt" que adiciona uma aba na Ribbon com atalhos de formatação (contábil, percentual, data, texto) para uso em planilhas financeiras. Hoje é implementado em VBA (`.xlam`), distribuído via GitHub Releases com um instalador PowerShell. Este milestone migra a implementação para C# (COM add-in), preservando a experiência da Ribbon para o usuário final, com um fluxo de desenvolvimento e release moderno inspirado no projeto irmão `outlook-classic-delay-send`.
+Add-in do Excel "Finance Fmt" que adiciona uma aba na Ribbon com atalhos de formatação (contábil, percentual, data, texto) para uso em planilhas financeiras. A implementação foi migrada de VBA (`.xlam`) para um add-in COM em C# (.NET Framework 4.8), preservando integralmente a experiência da Ribbon para o usuário final — mesmos grupos, mesmos botões, mesmos atalhos — com um fluxo de desenvolvimento e release moderno inspirado no projeto irmão `outlook-classic-delay-send`: testes automatizados (xUnit), instalador HKCU sem admin, pipeline de release via GitHub Actions e runbook `gh` CLI para release manual.
 
 ## Core Value
 
@@ -12,45 +12,44 @@ Aplicar formatos financeiros/contábeis padronizados a células do Excel com um 
 
 ### Validated
 
-<!-- Inferido do mapeamento do codebase VBA atual (.planning/codebase/). -->
-
-- ✓ Ribbon tab "Finance Fmt" com grupos Numérico/Percentual/Data/Texto/Info — existing
-- ✓ Botões de formatação contábil: Fin 2D/4D/8D — existing
-- ✓ Botões de percentual: Pct 2D/4D, e Spread (bps) — existing
-- ✓ Botões de data: Date ISO, Date BR, Date BR Long — existing
-- ✓ Botões utilitários: Integer, Text — existing
-- ✓ Checkboxes "Alinhar à direita" (ForceAlign) e "Zero contábil" (ZeroDash) alterando o formato aplicado — existing
-- ✓ Botão "Sobre" / link de documentação — existing
-- ✓ Instalador PowerShell que baixa a última release do GitHub e registra o add-in no Excel — existing
-- ✓ Distribuição via GitHub Releases (binário como asset, sem admin) — existing
+- ✓ Add-in reimplementado em C# como COM add-in puro (`IDTExtensibility2` + `IRibbonExtensibility` + Ribbon XML), sem VSTO — v1.0
+- ✓ Ribbon tab "Finance Fmt" com grupos Numérico/Percentual/Data/Texto/Info, mesmos botões/tooltips do VBA — v1.0 (código completo; smoke test em Excel real ainda `human_needed`)
+- ✓ Paridade de funcionalidade com todos os 11 formatos do VBA atual (Fin 0D/2D/4D/8D, % 2D/4D, Spread bps, ISO/BR/BR Extenso, Texto) — v1.0, 40/40 testes xUnit passando
+- ✓ Guarda de seleção inválida (Chart/Shape) mostra mensagem amigável em vez de quebrar o add-in (FMT-06) — v1.0
+- ✓ Checkboxes "Alinhar à direita" (off por padrão) e "Zero contábil" (on por padrão) funcionam durante a sessão, sem persistência entre aberturas do Excel — v1.0
+- ✓ Projeto compilável 100% via `dotnet` CLI (build/test), sem exigir Visual Studio completo — v1.0
+- ✓ Testes automatizados (xUnit) cobrindo o format engine com abstrações (`IExcelGateway`/`IRangeHandle`) que isolam a API real do Excel — v1.0
+- ✓ Instalador/desinstalador PowerShell (`scripts/install.ps1`/`uninstall.ps1`) que baixa a release do GitHub e registra o add-in via HKCU, sem admin, com proteção `DoNotDisableAddinList` contra soft-disable — v1.0 (código completo; execução em Windows+Excel real ainda `human_needed`)
+- ✓ Pipeline de CI (GitHub Actions, `.github/workflows/release.yml`) disparado por tag `v*.*.*` que compila, testa, empacota e publica a release automaticamente — v1.0 (código completo; disparo real em `windows-latest` ainda `human_needed`, pendente autorização explícita para o primeiro push real)
+- ✓ Runbook (`RELEASE.md`) + comandos `gh` documentados para criar releases manualmente, com changelog (`RELEASE_NOTES.md`) por release — v1.0
+- ✓ Código VBA legado arquivado na branch `archive/vba-legacy`, removido do fluxo principal (`main`) — v1.0
 
 ### Active
 
-<!-- Escopo deste milestone: migração VBA → C#. -->
+<!-- Nada definido ainda para o próximo milestone. Candidatos abaixo vêm do que já estava documentado como fora de escopo do v1.0 (REQUIREMENTS.md v2). -->
 
-- [ ] Add-in reimplementado em C# como COM add-in puro (IDTExtensibility2 + Ribbon XML), sem VSTO
-- [ ] Paridade de funcionalidade com todos os botões/formatos do VBA atual
-- [ ] Checkboxes "Alinhar à direita" e "Zero contábil" continuam funcionando durante a sessão, mas sem persistência entre aberturas do Excel — "Alinhar à direita" inicia desligado, "Zero contábil" inicia ligado
-- [ ] Projeto compilável 100% via `dotnet` CLI (sem exigir Visual Studio completo), desenvolvimento em VS Code
-- [ ] Testes automatizados (xUnit) cobrindo a lógica de negócio (format engine), com abstrações que isolam a API do Excel
-- [ ] Instalador PowerShell (`.ps1`) que baixa a release do GitHub e registra o add-in via HKCU (sem admin) — inspirado no `Install-OutlookUndoSend.ps1`
-- [ ] Pipeline de CI (GitHub Actions) disparado por tag `v*.*.*` que compila, testa, empacota e publica a release automaticamente
-- [ ] Runbook + comandos `gh` documentados para criar releases manualmente (executável por um agente de IA), com changelog por release
-- [ ] Código VBA legado arquivado na branch `archive/vba-legacy`, removido do fluxo principal (`main`)
+- [ ] Executar a primeira release real: `git push origin main` + `archive/vba-legacy` + tag `v2.0.0` + confirmar o workflow do GitHub Actions (ou o fallback manual `gh release create`) — ação humana explícita, não uma feature nova, mas o item aberto mais imediato antes de qualquer v1.1
+- [ ] Rodar os 3 checklists `human_needed` (live-Excel smoke test, live install/uninstall, live release) em uma máquina Windows+Excel real e registrar o resultado
+- [ ] Suporte a Excel 32-bit (detecção de bitness e registro condicional) — hoje o instalador só alerta, nunca bloqueia
+- [ ] Novos formatos/botões além dos 11 existentes
+- [ ] Internacionalização além de PT-BR
 
 ### Out of Scope
 
-- Persistência das preferências de "Alinhar à direita" / "Zero contábil" — removida deliberadamente nesta migração (simplificação pedida pelo usuário)
-- VSTO / instalador ClickOnce/MSI — exige Visual Studio completo, contrário ao fluxo VS Code + dotnet CLI desejado
-- Convivência VBA + C# em paralelo — a migração é uma substituição completa; o VBA fica arquivado só na branch `archive/vba-legacy`
-- Novos formatos de número ou funcionalidades além das já existentes no VBA — este milestone troca a implementação, não adiciona features
+- Persistência das preferências de "Alinhar à direita" / "Zero contábil" — removida deliberadamente na migração v1.0 (simplificação pedida pelo usuário); reavaliar apenas se usuários reais sentirem falta
+- VSTO / instalador ClickOnce/MSI — exige Visual Studio completo, contrário ao fluxo VS Code + dotnet CLI desejado; ainda válido
+- Convivência VBA + C# em paralelo — a migração v1.0 foi uma substituição completa; o VBA fica arquivado só na branch `archive/vba-legacy`; ainda válido
+- Suporte a Excel 32-bit no v1.0 — decisão explícita do usuário; reaberto como candidato de v2 acima (não é mais "fora de escopo para sempre", só para este milestone)
 
 ## Context
 
-- Codebase VBA mapeado em `.planning/codebase/` (`STACK.md`, `ARCHITECTURE.md`, `STRUCTURE.md`, `INTEGRATIONS.md`): 4 módulos `.bas` + 1 Ribbon XML, arquitetura em camadas (Ribbon UI → Callbacks → Format Engine → Config/Utils), estado persistido via `CustomXMLPart` dentro do próprio `.xlam`.
-- Projeto de inspiração: `~/pessoal/outlook-classic-delay-send` — add-in COM para Outlook Classic em C# 9 / .NET Framework 4.8 (buildado com .NET 8 SDK), arquitetura em camadas (`Abstractions/Domain/Services/Ui`), 25 testes xUnit, registro HKCU sem admin, instalador PowerShell one-liner, pipeline GitHub Actions (`windows-latest`) disparado por tag `v*.*.*`, e runbook `RELEASE.md` com comandos `gh` para release manual/assistida por IA.
-- Este repositório (`finance-fmt-tools`) já é distribuído publicamente via GitHub Releases, com instalador `Install-FinanceFmtTools.ps1` existente — o novo instalador deve substituir esse fluxo mantendo a mesma facilidade de uso (`irm ... | iex`).
-- Branch `archive/vba-legacy` já criada a partir do HEAD anterior a este milestone, preservando o código VBA antes do início da migração.
+- **Codebase atual**: solução C# com 3 projetos (`FinanceFmtTools.Engine` net48+net8.0, `FinanceFmtTools.ComAddin` net48, `FinanceFmtTools.Engine.Tests` net8.0/xUnit), 40 testes passando, 0 Warnings/0 Errors em `dotnet build`. Add-in COM (`Connect.cs`/`AddInHost.cs`) implementa `IDTExtensibility2`+`IRibbonExtensibility`, GUID fixo `881EFDF3-424C-4240-BCA0-714DAC2B9CD7`/ProgId `FinanceFmtTools.Connect`.
+- **Instalação**: `scripts/install.ps1`/`uninstall.ps1`/`verify-environment.ps1` — registro 100% HKCU, sem admin, sem `regasm`.
+- **Release**: `.github/workflows/release.yml` (tag-triggered, `windows-latest`) + `RELEASE.md` (runbook manual `gh` CLI) + `RELEASE_NOTES.md` (changelog). Asset fixo `FinanceFmtTools.zip`.
+- **VBA legado**: preservado integralmente na branch `archive/vba-legacy` (local, tip `cf2559b`), removido de `main`. `src/customUI14.xml` é a única exceção — continua ativo, embutido como `EmbeddedResource` no projeto C#.
+- **Estado do repositório real**: este é um repositório público real (`tpougy/finance-fmt-tools`) que já teve 2 releases VBA reais (`v1.0.0`/`v1.0.1`). Nenhum commit desta migração C# foi enviado ao `origin` ainda — isso é uma decisão deliberada de segurança (ver Key Decisions), não um esquecimento.
+- **Ambiente de desenvolvimento**: todo este milestone foi executado em um sandbox Linux/WSL sem Windows/Excel — 3 dos 5 fases (COM entry point, instalação, release) têm itens `human_needed` explícitos e documentados (ver STATE.md Deferred Items e `.planning/v1.0-MILESTONE-AUDIT.md`), nenhum foi simulado ou assumido como passando.
+- **Projeto de inspiração**: `~/pessoal/outlook-classic-delay-send` — forneceu o template quase verbatim para `Connect.cs`, `install.ps1`/`uninstall.ps1`, e `release.yml`/`RELEASE.md`, adaptado de Outlook para Excel.
 
 ## Constraints
 
@@ -64,11 +63,13 @@ Aplicar formatos financeiros/contábeis padronizados a células do Excel com um 
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| COM add-in puro (IDTExtensibility2 + Ribbon XML) em vez de VSTO | VSTO exige Visual Studio completo + ClickOnce/MSI; foge do fluxo VS Code + dotnet CLI pedido | — Pending |
-| Remover persistência de "Alinhar à direita" / "Zero contábil" | Simplificação pedida pelo usuário — evita complexidade de config store para 2 flags de baixo valor | — Pending |
-| "Alinhar à direita" = off por padrão, "Zero contábil" = on por padrão | Definido explicitamente pelo usuário para a versão sem persistência | — Pending |
-| CI completo (GitHub Actions) + runbook `gh` CLI para release | Usuário quer automação via tag push E um fluxo manual executável por IA, replicando o `outlook-classic-delay-send` | — Pending |
+| COM add-in puro (IDTExtensibility2 + Ribbon XML) em vez de VSTO | VSTO exige Visual Studio completo + ClickOnce/MSI; foge do fluxo VS Code + dotnet CLI pedido | ✓ Good — shipped em `Connect.cs`, build 100% via `dotnet` |
+| Remover persistência de "Alinhar à direita" / "Zero contábil" | Simplificação pedida pelo usuário — evita complexidade de config store para 2 flags de baixo valor | ✓ Good — `RibbonSessionConfig` é in-memory puro, sem `CustomXMLPart` |
+| "Alinhar à direita" = off por padrão, "Zero contábil" = on por padrão | Definido explicitamente pelo usuário para a versão sem persistência | ✓ Good — shipped exatamente assim, deliberadamente diferente dos 2 defaults contraditórios do VBA original |
+| CI completo (GitHub Actions) + runbook `gh` CLI para release | Usuário quer automação via tag push E um fluxo manual executável por IA, replicando o `outlook-classic-delay-send` | ✓ Good — `release.yml` + `RELEASE.md` shipped; disparo real ainda pendente (ver abaixo) |
 | VBA legado arquivado na branch `archive/vba-legacy` | Preserva histórico/código sem manter dois fluxos de release ativos | ✓ Good |
+| Aprovar 2 pacotes NuGet não-oficiais (`Microsoft.Office.Interop.Excel`/`MicrosoftOfficeCore16`, republicados por `CamronBute`) para referenciar tipos COM do Office sem instalação completa do Office/VSTO | Nenhum pacote oficial da Microsoft existe para isso; conteúdo verificado como genuíno via inspeção binária (`strings`/`.nupkg`) antes da aprovação autônoma | ✓ Good — build 100% verde, decisão documentada em STATE.md para revisão do usuário |
+| Nunca executar `git push origin main`/`archive/vba-legacy`, tag real, ou `gh release create` de forma autônoma contra o remoto real | Repositório é público e real, nunca recebeu esta migração; publicar ~95 commits e cortar uma release real são ações externamente visíveis e difíceis de reverter — exigem autorização humana explícita, mesmo dentro de um fluxo "100% autônomo" | — Pending (aguardando decisão do usuário; checklist completo em `05-04-SUMMARY.md`) |
 
 ## Evolution
 
@@ -88,4 +89,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-10 after initialization*
+*Last updated: 2026-07-11 after v1.0 milestone*

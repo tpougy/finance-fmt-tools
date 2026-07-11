@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: "Completed 05-04-PLAN.md (Phase 5 code complete, 4/4 plans — real release deferred as human_needed, resume-signal 'deferred — not releasing yet')"
-last_updated: "2026-07-11T19:15:00-03:00"
-last_activity: 2026-07-11
+status: Awaiting next milestone
+stopped_at: Completed 05-04-PLAN.md — Phase 5 fully code-complete (4/4 plans). Proceeding to Phase 5 code review + verification, then milestone lifecycle.
+last_updated: "2026-07-11T19:18:37.256Z"
+last_activity: 2026-07-11 — Milestone v1.0 completed and archived
 progress:
   total_phases: 5
   completed_phases: 5
@@ -25,13 +25,10 @@ See: .planning/PROJECT.md (updated 2026-07-10)
 
 ## Current Position
 
-Phase: 5 (CI/CD Pipeline & Release Runbook) — CODE COMPLETE, plans 4/4 done
-Plan: 4 of 4 complete (05-01 CI workflow, 05-02 release runbook/changelog, 05-03 VBA archival/README rewrite, 05-04 pre-flight check + human-authorization checkpoint)
-Next: Phase 5 code review, then Phase 5 VERIFICATION.md (expect `human_needed` — real release deferred), then milestone lifecycle (`gsd-audit-milestone` → `gsd-complete-milestone` → `gsd-cleanup`)
-Status: All 5 phases are code-complete. Phases 3, 4, and 5 each carry an explicit, itemized `human_needed` open item (live-Excel smoke test, live install/uninstall test, and the real git push/GitHub Release respectively) — none faked, none skipped, all requiring genuine human action outside this sandbox/session.
-Last activity: 2026-07-11
-
-Progress: [████████████] 100% (code-complete; 3 phases have outstanding human_needed items)
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-11 — Milestone v1.0 completed and archived
 
 ## Performance Metrics
 
@@ -101,14 +98,22 @@ None yet.
 
 ## Deferred Items
 
-Items acknowledged and carried forward from previous milestone close:
+Items acknowledged and deferred at v1.0 milestone close on 2026-07-11:
 
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| *(none)* | | | |
+| Category | Item | Status |
+|----------|------|--------|
+| verification_gap | Phase 03 (03-VERIFICATION.md) — live-Excel smoke test (RIB-01..04) requires a real Windows+Excel machine, unavailable in this Linux/WSL environment | human_needed |
+| verification_gap | Phase 04 (04-VERIFICATION.md) — live install/uninstall/idempotency/Resiliency test (INST-01..03) requires a real Windows+Excel machine | human_needed |
+| verification_gap | Phase 05 (05-VERIFICATION.md) — real git push + tag + live CI run or manual `gh release create` (REL-01) deliberately deferred pending explicit user authorization to publish to the real public remote | human_needed |
+
+All three are itemized, non-fabricated checklists recorded in their respective phase SUMMARY.md/VERIFICATION.md files and in `.planning/v1.0-MILESTONE-AUDIT.md` — none were silently skipped or assumed passing.
 
 ## Session Continuity
 
 Last session: 2026-07-11T19:15:00-03:00
 Stopped at: Completed 05-04-PLAN.md — Phase 5 fully code-complete (4/4 plans). Proceeding to Phase 5 code review + verification, then milestone lifecycle.
 Resume file: None
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
