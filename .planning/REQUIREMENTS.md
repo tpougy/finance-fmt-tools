@@ -88,7 +88,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INST-01 | Phase 4 - Installation & Registration | Code complete — human_needed (live install/uninstall test) |
 | INST-02 | Phase 4 - Installation & Registration | Code complete — human_needed (live install/uninstall test) |
 | INST-03 | Phase 4 - Installation & Registration | Code complete — human_needed (live install/uninstall test) |
-| REL-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Pending |
+| REL-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Code complete — human_needed (real tag push + live CI run) |
 | REL-02 | Phase 5 - CI/CD Pipeline & Release Runbook | Complete |
 | REL-03 | Phase 5 - CI/CD Pipeline & Release Runbook | Complete |
 | LEGACY-01 | Phase 5 - CI/CD Pipeline & Release Runbook | Complete |
