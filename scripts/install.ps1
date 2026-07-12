@@ -80,6 +80,16 @@ $Description  = 'Formatação financeira padronizada para mercado de capitais.'
 $OfficeVerKey = '16.0'
 
 # =============================================================================
+# Legado VBA (.xlam) — deteccao/remocao automatica antes de instalar a versao C#
+# =============================================================================
+# $VbaAddinTitle deve bater exatamente com o document property Title do .xlam
+# legado (usado para casar o add-in na colecao Excel.AddIns) — nao inventar
+# outro valor.
+$VbaAddinTitle = 'Finance Fmt Tools'
+$VbaAddinDir   = Join-Path $env:APPDATA 'Microsoft\AddIns'
+$VbaXlamPath   = Join-Path $VbaAddinDir 'FinanceFmtTools.xlam'
+
+# =============================================================================
 # GitHub Releases (INST-01) — URL "latest" e independente de versao de proposito
 # =============================================================================
 $GithubOwner = 'tpougy'
@@ -104,6 +114,10 @@ $AllFiles   = @($DllName) + $OtherFiles
 
 # Pasta temporaria de extracao (limpa ao final, se criada).
 $script:TempExtractDir = $null
+
+# So vira $true quando uma instalacao VBA legada foi efetivamente detectada E
+# removida do disco (consumido no relatorio final do PASSO 4).
+$script:VbaRemoved = $false
 
 # ---------------------------------------------------------------------------
 # Saida formatada
@@ -151,6 +165,69 @@ function Assert-ExcelNotRunning {
         Write-Info 'Ex.: powershell -ExecutionPolicy Bypass -File .\scripts\install.ps1 -Force'
         exit 1
     }
+}
+
+# Detecta uma instalacao legada da versao VBA (.xlam), desregistra-a do Excel via
+# automacao COM e remove o arquivo do disco. Nunca bloqueia a instalacao C#: qualquer
+# falha na automacao COM apenas gera um aviso e a funcao segue em frente.
+function Remove-LegacyVbaAddin {
+    if (-not (Test-Path -LiteralPath $VbaXlamPath)) {
+        # Sem instalacao legada — retorna cedo, sem abrir o Excel.
+        return
+    }
+    Write-Info ("Instalação legada da versão VBA detectada: {0}" -f $VbaXlamPath)
+
+    $excel      = $null
+    $wb         = $null
+    $foundAddin = $null
+
+    try {
+        try {
+            $excel = New-Object -ComObject Excel.Application
+            $excel.Visible = $false
+            $excel.DisplayAlerts = $false
+            # Necessario para acessar a colecao AddIns (mesmo padrao do instalador
+            # VBA legado arquivado — ver contexto do plano).
+            $wb = $excel.Workbooks.Add()
+
+            for ($i = 1; $i -le $excel.AddIns.Count; $i++) {
+                $ai = $excel.AddIns.Item($i)
+                if ($ai.Title -eq $VbaAddinTitle) {
+                    $foundAddin = $ai
+                    break
+                } else {
+                    [System.Runtime.InteropServices.Marshal]::ReleaseComObject($ai) | Out-Null
+                }
+            }
+
+            if ($foundAddin) {
+                $foundAddin.Installed = $false
+                Write-Ok ("Add-in VBA legado '{0}' desregistrado do Excel." -f $VbaAddinTitle)
+            } else {
+                Write-Info ("Nenhum add-in registrado com o título '{0}' foi encontrado no Excel — o arquivo será removido mesmo assim." -f $VbaAddinTitle)
+            }
+        } catch {
+            Write-Warn2 ("Não foi possível desregistrar o add-in VBA legado via Excel COM: {0}. O arquivo será removido mesmo assim." -f $_.Exception.Message)
+        }
+    } finally {
+        if ($wb) {
+            try { $wb.Close($false) } catch { }
+            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($wb) | Out-Null
+        }
+        if ($foundAddin) {
+            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($foundAddin) | Out-Null
+        }
+        if ($excel) {
+            try { $excel.Quit() } catch { }
+            [System.Runtime.InteropServices.Marshal]::ReleaseComObject($excel) | Out-Null
+        }
+        [GC]::Collect()
+        [GC]::WaitForPendingFinalizers()
+    }
+
+    Remove-Item -LiteralPath $VbaXlamPath -Force -ErrorAction SilentlyContinue
+    Write-Ok ("Instalação legada VBA (.xlam) removida: {0}" -f $VbaXlamPath)
+    $script:VbaRemoved = $true
 }
 
 # Le o cabecalho PE (MS-DOS/COFF) e retorna 'x64' / 'x86' / hex / 'desconhecido'.
