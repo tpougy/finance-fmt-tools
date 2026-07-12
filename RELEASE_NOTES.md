@@ -8,6 +8,49 @@ Releases do GitHub (editável de lá via `gh release edit`, não neste arquivo).
 
 ---
 
+## Finance Fmt Tools v2.0.1
+
+**Correção crítica**: a v2.0.0 publicava um add-in que **nunca carregava de verdade no Excel**,
+apesar de toda a suíte de testes automatizados (`dotnet test`) passar 100% e o pacote/instalador
+funcionarem sem erro aparente.
+
+### O que estava quebrado
+
+O shim `Extensibility.IDTExtensibility2` (declarado à mão em
+`src/FinanceFmtTools.ComAddin/Extensibility.cs`, já que não existe um pacote NuGet oficial e leve
+para essa interface COM clássica) estava incompleto: faltavam os atributos `[DispId]` em cada
+método e `[MarshalAs]`/`[In]` nos parâmetros (em especial `ref Array custom`, que precisa de
+`UnmanagedType.SafeArray`), que a interface COM real do Office define. Isso quebrava o layout de
+vtable que o carregador nativo de add-ins do Excel espera:
+
+- `CoCreateInstance`/`QueryInterface` funcionavam normalmente (o add-in aparecia na lista de
+  Suplementos COM);
+- mas a chamada real a `OnConnection` nunca chegava ao código gerenciado — o Excel silenciosamente
+  tratava isso como falha de carregamento e rebaixava `LoadBehavior` de `3` para `2` no primeiro
+  uso, sem gerar exceção .NET nem entrada no Visualizador de Eventos do Windows.
+
+Resultado prático para quem instalou a v2.0.0: o add-in aparecia em **Arquivo > Opções >
+Suplementos**, mas a aba "Finance Fmt" nunca aparecia na Ribbon.
+
+### Correção
+
+`Extensibility.cs` agora replica byte-a-byte a assinatura da interface COM real (`DispId(1..5)`,
+`MarshalAs(UnmanagedType.IDispatch)` para os parâmetros `object`, `MarshalAs(UnmanagedType.SafeArray)`
+para `ref Array custom`), verificada por reflection contra uma cópia real de `Extensibility.dll`.
+Reproduzido e confirmado corrigido em Excel real (Office 16.0, Click-to-Run x64): `LoadBehavior`
+permanece em `3` e o add-in conecta (`Connect=True`) de forma estável após reinstalação.
+
+### Ação recomendada
+
+Se você instalou a v2.0.0, rode o instalador novamente (mesmo comando, sem nenhum parâmetro extra)
+para atualizar para a v2.0.1 — o fluxo é idempotente:
+
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/scripts/install.ps1 | iex
+```
+
+---
+
 ## Finance Fmt Tools v2.0.0
 
 Esta é a primeira release da migração completa do add-in "Finance Fmt Tools" de VBA (`.xlam`) para
@@ -16,6 +59,9 @@ um add-in COM em C#. A experiência do usuário final na Ribbon do Excel é pres
 por trás foi reescrita em C#/.NET Framework 4.8, com cobertura de testes automatizados e um fluxo de
 build/release 100% via terminal (`dotnet` CLI + GitHub Actions), sem depender de Visual Studio
 completo.
+
+> **Nota**: esta versão tinha um bug crítico que impedia o add-in de carregar de verdade no Excel —
+> corrigido na v2.0.1 acima. Recomendamos atualizar diretamente para v2.0.1.
 
 ### O que mudou
 
