@@ -27,10 +27,6 @@ namespace FinanceFmtTools.Engine
         // Literal closing parenthesis wrapping the negative section.
         public const string CloseParen = ")";
 
-        // Padding the width of a hyphen without printing one; appended at the end of
-        // every section.
-        public const string PadHyphen = "_-";
-
         // The thousands-grouped digit pattern shared by the decimals==0 and decimals>0
         // cases (the latter appends DecimalPoint + a run of zeros).
         public const string DigitsBase = "#,##0";
