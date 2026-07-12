@@ -5,7 +5,7 @@ milestone_name: milestone
 status: Awaiting next milestone
 stopped_at: Completed 05-04-PLAN.md — Phase 5 fully code-complete (4/4 plans). Proceeding to Phase 5 code review + verification, then milestone lifecycle.
 last_updated: "2026-07-11T19:18:37.256Z"
-last_activity: 2026-07-12 - Completed quick task 260712-hzj: Corrigir race condition no Remove-LegacyVbaAddin
+last_activity: 2026-07-12 - Released v2.1.0 (VBA auto-migration in installer, PadHyphen removal, race-condition fix)
 progress:
   total_phases: 5
   completed_phases: 5
@@ -83,5 +83,10 @@ Resume file: None
 
 ## Operator Next Steps
 
-- v2.0.1 released 2026-07-12 (https://github.com/tpougy/finance-fmt-tools/releases/tag/v2.0.1) — supersedes the broken v2.0.0 (add-in never actually connected in Excel; see Deferred Items above). Verified end-to-end against a real Excel install via WSL2 interop: install, connect (LoadBehavior=3, Connect=True), uninstall, reinstall all confirmed working.
+- **v2.1.0 released 2026-07-12** (https://github.com/tpougy/finance-fmt-tools/releases/tag/v2.1.0) — current recommended release. Three changes, all via `/gsd-quick` tasks (260712-glm, h44, hbu, hzj — see Quick Tasks Completed above):
+  1. `FormatTokens.cs` extracted (refactor, no behavior change) — named constants for every combinable piece of the accounting number-format string.
+  2. `PadHyphen` token ("_-") removed from the final accounting format — only `OpenParenPad`/`CloseParenPad` ("_(" / "_)") remain as padding. Real behavior change (visual: one less trailing blank char), all 40 tests updated and passing.
+  3. `scripts/install.ps1` now detects a legacy VBA install (`FinanceFmtTools.xlam` in `%APPDATA%\Microsoft\AddIns`), unregisters it from Excel via COM (`AddIns.Installed = $false`) and deletes the file, automatically, before installing the C# version — no manual step needed anymore (supersedes the manual instruction published in v2.0.0's release notes).
+  - A real bug (race condition: `Remove-LegacyVbaAddin` didn't wait for the `EXCEL.EXE` process it spawned to actually exit before returning, causing an intermittent "Excel is open" failure in the next step) was found via live-Excel testing and fixed before release (260712-hzj).
+  - Verified end-to-end twice against real Excel via WSL2 interop: once with local `-Source` binaries, once with the real documented one-liner installer downloading the actual published v2.1.0 asset from GitHub Releases. Both times: legacy VBA fixture created via genuine Excel COM automation (Title="Finance Fmt Tools", registered `Installed=True`) → detected → unregistered → file deleted → C# add-in installed → `Connect=True`, `LoadBehavior=3` → no VBA residue left in the `AddIns` collection or on disk.
 - Start the next milestone with /gsd-new-milestone
