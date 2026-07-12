@@ -17,7 +17,7 @@ namespace FinanceFmtTools.ComAddin
     {
         // Mirrors src/modConfig.bas's CFG_ADDIN_NAME/CFG_ADDIN_VERSION/CFG_DOCS_URL verbatim.
         private const string AddinName = "Finance Fmt Tools";
-        private const string AddinVersion = "2.0.1";
+        private const string AddinVersion = "2.1.0";
         private const string DocsUrl = "https://github.com/tpougy/finance-fmt-tools";
 
         private readonly TraceLog _log = new TraceLog();

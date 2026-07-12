@@ -8,6 +8,40 @@ Releases do GitHub (editável de lá via `gh release edit`, não neste arquivo).
 
 ---
 
+## Finance Fmt Tools v2.1.0
+
+### Migração automática da versão VBA legada
+
+O instalador (`scripts/install.ps1`) agora detecta sozinho uma instalação anterior da versão VBA
+(`FinanceFmtTools.xlam` em `%APPDATA%\Microsoft\AddIns`), desregistra-a do Excel via automação COM
+(`AddIns.Installed = $false`, evitando deixar o Excel com uma referência quebrada a um arquivo que
+será apagado) e remove o arquivo do disco — tudo isso **antes** de instalar a versão C#, sem
+nenhuma ação manual do usuário. Isso substitui a orientação manual publicada na v2.0.0 ("remova o
+`.xlam` antes de instalar"). Se nenhuma instalação VBA for encontrada, essa etapa é pulada
+silenciosamente (não abre o Excel à toa). Validado de ponta a ponta contra Excel real (Office 16.0):
+detecção, desregistro, remoção do arquivo e instalação da versão C# em sequência, sem deixar
+resíduo de nenhuma das duas versões.
+
+### Ajuste no formato contábil
+
+O token de padding "_-" (espaço do tamanho de um hífen), usado no final de cada seção do formato
+contábil (`Fin 0D/2D/4D/8D`), foi removido — resta apenas o padding "_(" / "_)" (espaço do tamanho
+de um parêntese) já usado para alinhar os dígitos entre as seções positiva/negativa/zero. Efeito
+visual: uma célula formatada com `Fin 2D`, por exemplo, ganha um caractere a menos de espaço em
+branco à direita. Comportamento interno reorganizado em `FormatTokens.cs`, um arquivo dedicado de
+constantes nomeadas para cada peça combinável do formato — facilita ajustes futuros desse tipo sem
+precisar mexer na lógica de montagem em `AccountingFormatBuilder.cs`.
+
+### Correção de bug (encontrado em teste ao vivo)
+
+Durante a validação da migração automática de VBA contra um Excel real, foi encontrada e corrigida
+uma race condition: a rotina que desregistra o `.xlam` legado abre e fecha sua própria instância do
+Excel via COM, mas não esperava o processo `EXCEL.EXE` correspondente realmente terminar antes de
+devolver o controle — o que podia fazer a checagem seguinte ("Excel está aberto?") falhar
+intermitentemente. Corrigido com uma espera limitada (até 15s) pelo término do processo.
+
+---
+
 ## Finance Fmt Tools v2.0.1
 
 **Correção crítica**: a v2.0.0 publicava um add-in que **nunca carregava de verdade no Excel**,
