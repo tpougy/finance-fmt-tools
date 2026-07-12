@@ -12,23 +12,23 @@ Aplicar formatos financeiros/contábeis padronizados a células do Excel com um 
 
 ### Validated
 
-- ✓ Add-in reimplementado em C# como COM add-in puro (`IDTExtensibility2` + `IRibbonExtensibility` + Ribbon XML), sem VSTO — v1.0
-- ✓ Ribbon tab "Finance Fmt" com grupos Numérico/Percentual/Data/Texto/Info, mesmos botões/tooltips do VBA — v1.0 (código completo; smoke test em Excel real ainda `human_needed`)
+- ✓ Add-in reimplementado em C# como COM add-in puro (`IDTExtensibility2` + `IRibbonExtensibility` + Ribbon XML), sem VSTO — v1.0/v2.0.1 (ver bug crítico de marshaling COM corrigido na v2.0.1, abaixo)
+- ✓ Ribbon tab "Finance Fmt" com grupos Numérico/Percentual/Data/Texto/Info, mesmos botões/tooltips do VBA — v2.0.1, smoke test em Excel real confirmado em 2026-07-12 via interop WSL2↔Windows (`Excel.Application` COM automation: `Connect=True`, `LoadBehavior=3` estável)
 - ✓ Paridade de funcionalidade com todos os 11 formatos do VBA atual (Fin 0D/2D/4D/8D, % 2D/4D, Spread bps, ISO/BR/BR Extenso, Texto) — v1.0, 40/40 testes xUnit passando
 - ✓ Guarda de seleção inválida (Chart/Shape) mostra mensagem amigável em vez de quebrar o add-in (FMT-06) — v1.0
 - ✓ Checkboxes "Alinhar à direita" (off por padrão) e "Zero contábil" (on por padrão) funcionam durante a sessão, sem persistência entre aberturas do Excel — v1.0
 - ✓ Projeto compilável 100% via `dotnet` CLI (build/test), sem exigir Visual Studio completo — v1.0
 - ✓ Testes automatizados (xUnit) cobrindo o format engine com abstrações (`IExcelGateway`/`IRangeHandle`) que isolam a API real do Excel — v1.0
-- ✓ Instalador/desinstalador PowerShell (`scripts/install.ps1`/`uninstall.ps1`) que baixa a release do GitHub e registra o add-in via HKCU, sem admin, com proteção `DoNotDisableAddinList` contra soft-disable — v1.0 (código completo; execução em Windows+Excel real ainda `human_needed`)
-- ✓ Pipeline de CI (GitHub Actions, `.github/workflows/release.yml`) disparado por tag `v*.*.*` que compila, testa, empacota e publica a release automaticamente — v1.0, disparo real confirmado em `windows-latest`: tag `v2.0.0` publicada em 2026-07-12, workflow verde (restore/build/test/package/release), asset `FinanceFmtTools.zip` verificado (7/7 arquivos, zip íntegro)
+- ✓ Instalador/desinstalador PowerShell (`scripts/install.ps1`/`uninstall.ps1`) que baixa a release do GitHub e registra o add-in via HKCU, sem admin, com proteção `DoNotDisableAddinList` contra soft-disable — v2.0.1, testado em Excel real em 2026-07-12: install/uninstall/reinstall idempotentes confirmados, registro limpo após uninstall
+- ✓ Pipeline de CI (GitHub Actions, `.github/workflows/release.yml`) disparado por tag `v*.*.*` que compila, testa, empacota e publica a release automaticamente — confirmado em `windows-latest` para `v2.0.0` (2026-07-12) e `v2.0.1` (2026-07-12), ambos workflows verdes, assets verificados
 - ✓ Runbook (`RELEASE.md`) + comandos `gh` documentados para criar releases manualmente, com changelog (`RELEASE_NOTES.md`) por release — v1.0
 - ✓ Código VBA legado arquivado na branch `archive/vba-legacy`, removido do fluxo principal (`main`) — v1.0, branch publicada em `origin` em 2026-07-12
+- ✓ Bug crítico de marshaling COM (add-in nunca conectava de verdade no Excel, apesar de `dotnet test` 100% verde) encontrado e corrigido — v2.0.1 (2026-07-12), ver Key Decisions
 
 ### Active
 
 <!-- Nada definido ainda para o próximo milestone. Candidatos abaixo vêm do que já estava documentado como fora de escopo do v1.0 (REQUIREMENTS.md v2). -->
 
-- [ ] Rodar os 2 checklists `human_needed` restantes (live-Excel smoke test, live install/uninstall) em uma máquina Windows+Excel real e registrar o resultado
 - [ ] Suporte a Excel 32-bit (detecção de bitness e registro condicional) — hoje o instalador só alerta, nunca bloqueia
 - [ ] Novos formatos/botões além dos 11 existentes
 - [ ] Internacionalização além de PT-BR
@@ -42,13 +42,13 @@ Aplicar formatos financeiros/contábeis padronizados a células do Excel com um 
 
 ## Context
 
-- **Codebase atual**: solução C# com 3 projetos (`FinanceFmtTools.Engine` net48+net8.0, `FinanceFmtTools.ComAddin` net48, `FinanceFmtTools.Engine.Tests` net8.0/xUnit), 40 testes passando, 0 Warnings/0 Errors em `dotnet build`. Add-in COM (`Connect.cs`/`AddInHost.cs`) implementa `IDTExtensibility2`+`IRibbonExtensibility`, GUID fixo `881EFDF3-424C-4240-BCA0-714DAC2B9CD7`/ProgId `FinanceFmtTools.Connect`.
-- **Instalação**: `scripts/install.ps1`/`uninstall.ps1`/`verify-environment.ps1` — registro 100% HKCU, sem admin, sem `regasm`.
+- **Codebase atual**: solução C# com 3 projetos (`FinanceFmtTools.Engine` net48+net8.0, `FinanceFmtTools.ComAddin` net48, `FinanceFmtTools.Engine.Tests` net8.0/xUnit), 40 testes passando, 0 Warnings/0 Errors em `dotnet build`. Add-in COM (`Connect.cs`/`AddInHost.cs`) implementa `IDTExtensibility2`+`IRibbonExtensibility`, GUID fixo `881EFDF3-424C-4240-BCA0-714DAC2B9CD7`/ProgId `FinanceFmtTools.Connect`. Versão atual: **2.0.1**.
+- **Instalação**: `scripts/install.ps1`/`uninstall.ps1`/`verify-environment.ps1` — registro 100% HKCU, sem admin, sem `regasm`. Testado de ponta a ponta em Excel real (ver abaixo).
 - **Release**: `.github/workflows/release.yml` (tag-triggered, `windows-latest`) + `RELEASE.md` (runbook manual `gh` CLI) + `RELEASE_NOTES.md` (changelog). Asset fixo `FinanceFmtTools.zip`.
 - **VBA legado**: preservado integralmente na branch `archive/vba-legacy` (local, tip `cf2559b`), removido de `main`. `src/customUI14.xml` é a única exceção — continua ativo, embutido como `EmbeddedResource` no projeto C#.
-- **Estado do repositório real**: `tpougy/finance-fmt-tools` é um repositório público real. Teve 2 releases VBA (`v1.0.0`/`v1.0.1`) e, em 2026-07-12, a primeira release C# (`v2.0.0`) — `main` e `archive/vba-legacy` publicados em `origin`, tag `v2.0.0` disparou `.github/workflows/release.yml` com sucesso em `windows-latest`. Push/release autorizado explicitamente pelo usuário.
-- **Ambiente de desenvolvimento**: todo este milestone foi executado em um sandbox Linux/WSL sem Windows/Excel — 3 dos 5 fases (COM entry point, instalação, release) têm itens `human_needed` explícitos e documentados (ver STATE.md Deferred Items e `.planning/v1.0-MILESTONE-AUDIT.md`), nenhum foi simulado ou assumido como passando.
-- **Projeto de inspiração**: `~/pessoal/outlook-classic-delay-send` — forneceu o template quase verbatim para `Connect.cs`, `install.ps1`/`uninstall.ps1`, e `release.yml`/`RELEASE.md`, adaptado de Outlook para Excel.
+- **Estado do repositório real**: `tpougy/finance-fmt-tools` é um repositório público real. Teve 2 releases VBA (`v1.0.0`/`v1.0.1`) e, em 2026-07-12, as duas primeiras releases C#: `v2.0.0` (com um bug crítico — add-in nunca conectava de verdade no Excel) e `v2.0.1` (correção, release recomendada atual). `main` e `archive/vba-legacy` publicados em `origin`.
+- **Ambiente de desenvolvimento**: sandbox Linux/WSL2. **Correção importante em relação ao que foi assumido no fechamento do v1.0**: este ambiente WSL2 TEM acesso via interop a um host Windows real com Excel 16.0 (Click-to-Run x64) instalado (`powershell.exe`/`cscript.exe` em `/mnt/c/Windows/System32/...`, caminhos do repo acessíveis via `\\wsl.localhost\...`). Testes reais de instalação/desinstalação e de conexão do add-in no Excel via automação COM **são possíveis** e já foram executados com sucesso (2026-07-12) — a suposição anterior de "human_needed" para esses itens estava errada.
+- **Projeto de inspiração**: `~/pessoal/outlook-classic-delay-send` — forneceu o template quase verbatim para `Connect.cs`, `install.ps1`/`uninstall.ps1`, e `release.yml`/`RELEASE.md`, adaptado de Outlook para Excel. Sua cópia real de `lib/Extensibility.dll` foi essencial para diagnosticar o bug de marshaling COM da v2.0.0 via reflection.
 
 ## Constraints
 
@@ -69,6 +69,7 @@ Aplicar formatos financeiros/contábeis padronizados a células do Excel com um 
 | VBA legado arquivado na branch `archive/vba-legacy` | Preserva histórico/código sem manter dois fluxos de release ativos | ✓ Good |
 | Aprovar 2 pacotes NuGet não-oficiais (`Microsoft.Office.Interop.Excel`/`MicrosoftOfficeCore16`, republicados por `CamronBute`) para referenciar tipos COM do Office sem instalação completa do Office/VSTO | Nenhum pacote oficial da Microsoft existe para isso; conteúdo verificado como genuíno via inspeção binária (`strings`/`.nupkg`) antes da aprovação autônoma | ✓ Good — build 100% verde, decisão documentada em STATE.md para revisão do usuário |
 | Nunca executar `git push origin main`/`archive/vba-legacy`, tag real, ou `gh release create` de forma autônoma contra o remoto real, sem autorização explícita | Repositório é público e real; publicar ~100 commits e cortar uma release real são ações externamente visíveis e difíceis de reverter — exigem autorização humana explícita, mesmo dentro de um fluxo "100% autônomo" | ✓ Good — usuário autorizou explicitamente em 2026-07-12 ("Execute os testes e crie você mesmo o release"); push + tag `v2.0.0` + release executados e verificados |
+| Usar interop WSL2↔Windows (`powershell.exe`/`cscript.exe` via `/mnt/c`) para testar de verdade contra um Excel real, em vez de aceitar a suposição anterior de "impossível neste ambiente" | Usuário pediu para investigar um relato de "o instalador não está funcionando"; testar contra o Excel real do host revelou que o add-in v2.0.0 nunca conectava de verdade (`LoadBehavior` 3→2 silencioso), um bug que toda a suíte `dotnet test` e a revisão de código do v1.0 não detectaram | ✓ Good — bug real encontrado e corrigido (v2.0.1); invalida a suposição de `human_needed` registrada no fechamento do milestone v1.0 para as Fases 3 e 4 |
 
 ## Evolution
 

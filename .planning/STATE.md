@@ -58,11 +58,13 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-07-11:
 
 | Category | Item | Status |
 |----------|------|--------|
-| verification_gap | Phase 03 (03-VERIFICATION.md) — live-Excel smoke test (RIB-01..04) requires a real Windows+Excel machine, unavailable in this Linux/WSL environment | human_needed |
-| verification_gap | Phase 04 (04-VERIFICATION.md) — live install/uninstall/idempotency/Resiliency test (INST-01..03) requires a real Windows+Excel machine | human_needed |
-| ~~verification_gap~~ | ~~Phase 05 (05-VERIFICATION.md) — real git push + tag + live CI run~~ — **resolved 2026-07-12**: user explicitly authorized the push; `main` + `archive/vba-legacy` pushed to `origin`, tag `v2.0.0` pushed, `.github/workflows/release.yml` ran green on `windows-latest`, release published and asset verified (`gh release download` + zip integrity check, 7/7 files) | done |
+| ~~verification_gap~~ | ~~Phase 03 — live-Excel smoke test~~ — **resolved 2026-07-12**: WSL2 has interop access to a real Windows host with Excel 16.0 (Click-to-Run x64) installed (`powershell.exe`/`cscript.exe` at `/mnt/c/Windows/System32/...`); the "no Windows+Excel available" assumption from milestone close was **wrong**. Verified live via `Excel.Application` COM automation: add-in connects (`COMAddIns(...).Connect = True`), `LoadBehavior` stable at `3` across sessions. | done |
+| ~~verification_gap~~ | ~~Phase 04 — live install/uninstall test~~ — **resolved 2026-07-12**: ran the real documented one-liner install (downloads from GitHub Releases) and `scripts/uninstall.ps1` repeatedly against the real Windows host — idempotent, clean install/uninstall/reinstall cycles confirmed, registry left clean after uninstall. | done |
+| ~~verification_gap~~ | ~~Phase 05 — real git push + tag + live CI run~~ — **resolved 2026-07-12**: user explicitly authorized the push; `main` + `archive/vba-legacy` pushed to `origin`, tag `v2.0.0` pushed, `.github/workflows/release.yml` ran green on `windows-latest`, release published and asset verified (`gh release download` + zip integrity check, 7/7 files) | done |
 
-Phase 03 and 04 items remain open — both require a real Windows+Excel machine, which this sandbox does not have. Phase 05's release item is closed; see `RELEASE_NOTES.md`/tag `v2.0.0` and https://github.com/tpougy/finance-fmt-tools/releases/tag/v2.0.0.
+**All three original Deferred Items are now closed.** However, live testing (Phase 03/04) surfaced a **critical bug that the entire v1.0 test suite, code review, and verification process had missed**: the add-in never actually connected in real Excel. `LoadBehavior` silently downgraded `3 -> 2` on first load — no managed exception, no Windows Event Log entry, `dotnet test` 40/40 green throughout. Root cause: the hand-rolled `Extensibility.IDTExtensibility2` COM shim (`src/FinanceFmtTools.ComAddin/Extensibility.cs`) was missing `[DispId]`/`[In]`/`[MarshalAs]` attributes the real COM interface requires (verified by reflecting on a genuine `Extensibility.dll` from the sibling project and diffing exact method signatures). `QueryInterface` for the interface succeeded either way, which is why this looked like nothing was wrong — the vtable ABI itself was incompatible, not the interface identity. Fixed and released as **v2.0.1** (2026-07-12), confirmed working end-to-end via the real documented one-liner installer against real Excel.
+
+**Process lesson**: none of Phases 1-5's automated tests (unit tests, code review, plan-checker, verifier) could have caught this — it only surfaces when a real native host (Excel) tries to call through the vtable. Pure managed-code testing and even direct COM activation/QueryInterface checks are insufficient to validate a hand-rolled classic COM interop shim; only a real native caller exercising the actual method calls proves it. See `RELEASE_NOTES.md`'s v2.0.1 entry for the full writeup.
 
 ## Session Continuity
 
@@ -72,5 +74,5 @@ Resume file: None
 
 ## Operator Next Steps
 
-- v2.0.0 released 2026-07-12 (https://github.com/tpougy/finance-fmt-tools/releases/tag/v2.0.0). Remaining human_needed items: live-Excel smoke test (Phase 3) and live install/uninstall test (Phase 4) — both require a real Windows+Excel machine.
+- v2.0.1 released 2026-07-12 (https://github.com/tpougy/finance-fmt-tools/releases/tag/v2.0.1) — supersedes the broken v2.0.0 (add-in never actually connected in Excel; see Deferred Items above). Verified end-to-end against a real Excel install via WSL2 interop: install, connect (LoadBehavior=3, Connect=True), uninstall, reinstall all confirmed working.
 - Start the next milestone with /gsd-new-milestone
