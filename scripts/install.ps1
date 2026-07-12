@@ -229,6 +229,18 @@ function Remove-LegacyVbaAddin {
         }
         [GC]::Collect()
         [GC]::WaitForPendingFinalizers()
+        [GC]::Collect()
+
+        # Assert-ExcelNotRunning ja confirmou, antes desta funcao ser chamada, que nao
+        # havia Excel do usuario aberto — logo, qualquer EXCEL.EXE visto aqui e' necessariamente
+        # o processo que esta funcao abriu e mandou fechar via $excel.Quit(). Sem esperar seu
+        # termino, o PASSO 2 pode chamar Assert-ExcelNotRunning de novo e ainda encontra-lo em
+        # fase de encerramento (a race condition que este loop elimina).
+        for ($i = 0; $i -lt 15; $i++) {
+            Start-Sleep -Seconds 1
+            $legacyExcelProc = Get-Process -Name 'EXCEL' -ErrorAction SilentlyContinue
+            if (-not $legacyExcelProc) { break }
+        }
     }
 
     Remove-Item -LiteralPath $VbaXlamPath -Force -ErrorAction SilentlyContinue
