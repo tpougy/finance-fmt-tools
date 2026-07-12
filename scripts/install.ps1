@@ -2,6 +2,8 @@
 <#
 .SYNOPSIS
     Instala o add-in COM "Finance Fmt Tools" (C# / Excel) no Excel 64-bit. Uso do USUARIO FINAL.
+    Tambem detecta e remove automaticamente uma instalacao legada da versao VBA (.xlam),
+    se presente, antes de instalar a versao C#.
 
 .DESCRIPTION
     Registra o add-in COM FinanceFmtTools.ComAddin inteiramente em HKCU, sem exigir
@@ -10,14 +12,18 @@
     tecnica).
 
     FLUXO PRINCIPAL (nenhum parametro — o one-liner documentado):
-      1. Baixa o pacote .zip mais recente do GitHub Releases (release-agnostic —
+      1. Detecta uma instalacao legada da versao VBA (FinanceFmtTools.xlam em
+         %APPDATA%\Microsoft\AddIns) e, se encontrada, desregistra-a do Excel via
+         automacao COM e remove o arquivo, antes de prosseguir com os passos
+         abaixo.
+      2. Baixa o pacote .zip mais recente do GitHub Releases (release-agnostic —
          a URL "latest/download/" nunca muda entre versoes).
-      2. Extrai o .zip para uma pasta temporaria sob %TEMP% (nunca extrai direto
+      3. Extrai o .zip para uma pasta temporaria sob %TEMP% (nunca extrai direto
          para a pasta de instalacao final — mitigacao de zip-slip).
-      3. Copia os 4 arquivos necessarios para %LocalAppData%\FinanceFmtTools\.
-      4. Registra as 3 arvores de registro HKCU (classe COM, descoberta pelo Excel
+      4. Copia os 4 arquivos necessarios para %LocalAppData%\FinanceFmtTools\.
+      5. Registra as 3 arvores de registro HKCU (classe COM, descoberta pelo Excel
          com LoadBehavior=3, e a chave de Resiliency DoNotDisableAddinList).
-      5. Valida o pos-instalacao e limpa a pasta temporaria.
+      6. Valida o pos-instalacao e limpa a pasta temporaria.
 
     ESCOTILHA DE TESTE LOCAL (-Package/-Source):
       Ate o Phase 5 publicar um release C# real via CI, use -Package <zip> ou
@@ -301,6 +307,9 @@ Write-Step 'Pré-instalação'
 
 Assert-ExcelNotRunning
 
+Write-Step 'Detectando instalação VBA legada'
+Remove-LegacyVbaAddin
+
 # Bitness do Office — apenas informativo (Architectural Responsibility Map:
 # "Bitness detection/guard (64-bit-only scope) — Installer script"). NUNCA
 # bloqueia a instalacao; o add-in e AnyCPU e deve carregar mesmo em 32-bit,
@@ -545,6 +554,12 @@ Write-Host ("      HKCU\Software\Classes\CLSID\{0}\InprocServer32" -f $Guid)
 Write-Host ("      HKCU\Software\Classes\{0}" -f $ProgId)
 Write-Host ("      HKCU\Software\Microsoft\Office\Excel\Addins\{0}  (LoadBehavior=3)" -f $ProgId)
 Write-Host ("      HKCU\Software\Microsoft\Office\{0}\Excel\Resiliency\DoNotDisableAddinList\{1}=1" -f $OfficeVerKey, $ProgId)
+
+if ($script:VbaRemoved) {
+    Write-Host ''
+    Write-Host 'Migração automática:' -ForegroundColor White
+    Write-Host ("  - Instalação legada VBA (.xlam) detectada e removida: {0}" -f $VbaXlamPath)
+}
 
 Write-Host ''
 Write-Host 'Próximos passos:' -ForegroundColor White
