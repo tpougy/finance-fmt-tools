@@ -5,7 +5,7 @@ milestone_name: milestone
 status: Awaiting next milestone
 stopped_at: Completed 05-04-PLAN.md — Phase 5 fully code-complete (4/4 plans). Proceeding to Phase 5 code review + verification, then milestone lifecycle.
 last_updated: "2026-07-11T19:18:37.256Z"
-last_activity: 2026-07-11 — Milestone v1.0 completed and archived
+last_activity: 2026-07-12 - Completed quick task 260712-glm: Refatorar AccountingFormatBuilder para usar tabela de tokens combinaveis em C#
 progress:
   total_phases: 5
   completed_phases: 5
@@ -51,6 +51,12 @@ None yet.
 ### Blockers/Concerns
 
 None currently open (all v1.0 blockers resolved or reclassified as Deferred Items below).
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260712-glm | Refatorar AccountingFormatBuilder para usar tabela de tokens combináveis em C# | 2026-07-12 | afe34c7 | [260712-glm-refatorar-accountingformatbuilder-para-u](./quick/260712-glm-refatorar-accountingformatbuilder-para-u/) |
 
 ## Deferred Items
 
