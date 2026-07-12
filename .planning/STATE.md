@@ -5,7 +5,7 @@ milestone_name: milestone
 status: Awaiting next milestone
 stopped_at: Completed 05-04-PLAN.md — Phase 5 fully code-complete (4/4 plans). Proceeding to Phase 5 code review + verification, then milestone lifecycle.
 last_updated: "2026-07-11T19:18:37.256Z"
-last_activity: 2026-07-12 - Completed quick task 260712-h44: Remover PadHyphen do formato contabil final
+last_activity: 2026-07-12 - Completed quick task 260712-hzj: Corrigir race condition no Remove-LegacyVbaAddin
 progress:
   total_phases: 5
   completed_phases: 5
@@ -58,6 +58,8 @@ None currently open (all v1.0 blockers resolved or reclassified as Deferred Item
 |---|-------------|------|--------|-----------|
 | 260712-glm | Refatorar AccountingFormatBuilder para usar tabela de tokens combináveis em C# | 2026-07-12 | afe34c7 | [260712-glm-refatorar-accountingformatbuilder-para-u](./quick/260712-glm-refatorar-accountingformatbuilder-para-u/) |
 | 260712-h44 | Remover token PadHyphen do formato contábil final (sobra apenas Open/CloseParenPad) | 2026-07-12 | caa55bf | [260712-h44-remover-padhyphen-do-formato-contabil-fi](./quick/260712-h44-remover-padhyphen-do-formato-contabil-fi/) |
+| 260712-hbu | Adicionar detecção e remoção automática de instalação VBA legada (.xlam) a scripts/install.ps1 | 2026-07-12 | e0db2a9 | [260712-hbu-adicionar-deteccao-e-remocao-de-instalac](./quick/260712-hbu-adicionar-deteccao-e-remocao-de-instalac/) |
+| 260712-hzj | Corrigir race condition (EXCEL.EXE ainda de pé) em Remove-LegacyVbaAddin, achada em teste ao vivo | 2026-07-12 | 528082f | [260712-hzj-corrigir-race-condition-no-remove-legacy](./quick/260712-hzj-corrigir-race-condition-no-remove-legacy/) |
 
 ## Deferred Items
 
