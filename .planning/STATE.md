@@ -60,9 +60,9 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-07-11:
 |----------|------|--------|
 | verification_gap | Phase 03 (03-VERIFICATION.md) — live-Excel smoke test (RIB-01..04) requires a real Windows+Excel machine, unavailable in this Linux/WSL environment | human_needed |
 | verification_gap | Phase 04 (04-VERIFICATION.md) — live install/uninstall/idempotency/Resiliency test (INST-01..03) requires a real Windows+Excel machine | human_needed |
-| verification_gap | Phase 05 (05-VERIFICATION.md) — real git push + tag + live CI run or manual `gh release create` (REL-01) deliberately deferred pending explicit user authorization to publish to the real public remote | human_needed |
+| ~~verification_gap~~ | ~~Phase 05 (05-VERIFICATION.md) — real git push + tag + live CI run~~ — **resolved 2026-07-12**: user explicitly authorized the push; `main` + `archive/vba-legacy` pushed to `origin`, tag `v2.0.0` pushed, `.github/workflows/release.yml` ran green on `windows-latest`, release published and asset verified (`gh release download` + zip integrity check, 7/7 files) | done |
 
-All three are itemized, non-fabricated checklists recorded in their respective phase SUMMARY.md/VERIFICATION.md files and in `.planning/v1.0-MILESTONE-AUDIT.md` — none were silently skipped or assumed passing.
+Phase 03 and 04 items remain open — both require a real Windows+Excel machine, which this sandbox does not have. Phase 05's release item is closed; see `RELEASE_NOTES.md`/tag `v2.0.0` and https://github.com/tpougy/finance-fmt-tools/releases/tag/v2.0.0.
 
 ## Session Continuity
 
@@ -72,4 +72,5 @@ Resume file: None
 
 ## Operator Next Steps
 
+- v2.0.0 released 2026-07-12 (https://github.com/tpougy/finance-fmt-tools/releases/tag/v2.0.0). Remaining human_needed items: live-Excel smoke test (Phase 3) and live install/uninstall test (Phase 4) — both require a real Windows+Excel machine.
 - Start the next milestone with /gsd-new-milestone
