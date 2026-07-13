@@ -6,6 +6,52 @@
 
 ---
 
+## Instalação
+
+Abra o **PowerShell** no Windows e execute o comando abaixo (não é necessário ser administrador):
+
+```ps1
+Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/scripts/install.ps1 | iex
+```
+
+> Este comando baixa e executa `install.ps1` diretamente do branch `main`, sem checksum ou
+> assinatura — revise o script antes de rodar se preferir uma verificação manual.
+
+Isso baixa a release mais recente do GitHub, registra o add-in COM inteiramente em `HKCU`
+(nenhuma chave em `HKLM`, nenhum `regasm`) e valida a instalação automaticamente.
+
+**Requisitos:**
+
+- Windows + Excel 2016 ou superior (baseline validado: **64-bit** — 32-bit não é bloqueado pelo instalador, mas não é testado)
+- .NET Framework 4.8 ou superior
+- Nenhum privilégio de administrador é necessário
+
+**Diagnóstico opcional antes de instalar** — para conferir se a máquina atende aos requisitos de runtime sem instalar nada:
+
+```ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\verify-environment.ps1 -RuntimeOnly
+```
+
+**Para remover o add-in**, use o desinstalador (remove os arquivos e as 3 árvores de registro em `HKCU` criadas pelo instalador):
+
+```ps1
+Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/scripts/uninstall.ps1 | iex
+```
+
+### Atualizando da versão VBA
+
+Se você já tinha o add-in antigo (`.xlam`, VBA) instalado, remova-o **antes** de instalar esta versão,
+para evitar duas abas "Finance Fmt" simultâneas no ribbon:
+
+1. No Excel, vá em **Arquivo > Opções > Suplementos**.
+2. No campo "Gerenciar", selecione **Suplementos COM** e clique em **Ir...**.
+3. Desmarque/remova o suplemento antigo da lista.
+4. Se o arquivo `.xlam` ainda existir em `%APPDATA%\Microsoft\AddIns`, apague-o manualmente.
+
+Depois disso, rode o instalador acima normalmente.
+
+---
+
 ## Introdução
 
 O **Finance Format Tools** é um add-in para Excel desenvolvido para padronizar a formatação de dados em planilhas de renda fixa e mercado de capitais. Ele resolve um problema recorrente em análises de debêntures, CRI/CRA, NTN-B e FIIs: a ausência de um padrão consistente de exibição para taxas, preços unitários, spreads e datas — que muitas vezes resulta em células com formatações inconsistentes, números difíceis de comparar visualmente e erros silenciosos de leitura.
@@ -168,52 +214,6 @@ O prefixo `[$-pt-BR]` instrui o Excel a usar o locale pt-BR para abreviações d
 ### Texto
 
 Aplica a format string `@`, que força o Excel a tratar o conteúdo da célula como texto — útil para CNPJs, códigos CETIP, CEPs e outros identificadores que começam com zero ou contêm caracteres que o Excel interpretaria como número ou data.
-
----
-
-## Instalação
-
-Abra o **PowerShell** no Windows e execute o comando abaixo (não é necessário ser administrador):
-
-```ps1
-Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/scripts/install.ps1 | iex
-```
-
-> Este comando baixa e executa `install.ps1` diretamente do branch `main`, sem checksum ou
-> assinatura — revise o script antes de rodar se preferir uma verificação manual.
-
-Isso baixa a release mais recente do GitHub, registra o add-in COM inteiramente em `HKCU`
-(nenhuma chave em `HKLM`, nenhum `regasm`) e valida a instalação automaticamente.
-
-**Requisitos:**
-
-- Windows + Excel 2016 ou superior (baseline validado: **64-bit** — 32-bit não é bloqueado pelo instalador, mas não é testado)
-- .NET Framework 4.8 ou superior
-- Nenhum privilégio de administrador é necessário
-
-**Diagnóstico opcional antes de instalar** — para conferir se a máquina atende aos requisitos de runtime sem instalar nada:
-
-```ps1
-powershell -ExecutionPolicy Bypass -File .\scripts\verify-environment.ps1 -RuntimeOnly
-```
-
-**Para remover o add-in**, use o desinstalador (remove os arquivos e as 3 árvores de registro em `HKCU` criadas pelo instalador):
-
-```ps1
-Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/scripts/uninstall.ps1 | iex
-```
-
-### Atualizando da versão VBA
-
-Se você já tinha o add-in antigo (`.xlam`, VBA) instalado, remova-o **antes** de instalar esta versão,
-para evitar duas abas "Finance Fmt" simultâneas no ribbon:
-
-1. No Excel, vá em **Arquivo > Opções > Suplementos**.
-2. No campo "Gerenciar", selecione **Suplementos COM** e clique em **Ir...**.
-3. Desmarque/remova o suplemento antigo da lista.
-4. Se o arquivo `.xlam` ainda existir em `%APPDATA%\Microsoft\AddIns`, apague-o manualmente.
-
-Depois disso, rode o instalador acima normalmente.
 
 ---
 
