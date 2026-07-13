@@ -1,39 +1,39 @@
-﻿<#
+<#
 .SYNOPSIS
     Auditoria de ambiente (somente leitura) para o projeto Finance Fmt Tools (C#).
 
 .DESCRIPTION
-    Verifica os pré-requisitos do add-in COM "Finance Fmt Tools". Não altera nada
-    na máquina: apenas lê e relata.
+    Verifica os pre-requisitos do add-in COM "Finance Fmt Tools". Nao altera nada
+    na maquina: apenas le e relata.
 
-    Imprime um relatório legível com marcadores [OK] / [MISSING] / [FAIL] / [INFO] e
+    Imprime um relatorio legivel com marcadores [OK] / [MISSING] / [FAIL] / [INFO] e
     retorna exit code 0 se todos os itens ESSENCIAIS estiverem presentes; caso
-    contrário retorna exit code 1 (para permitir automação).
+    contrario retorna exit code 1 (para permitir automacao).
 
     Idempotente e seguro: pode ser executado quantas vezes quiser.
 
-    DOIS PERFIS DE PRÉ-REQUISITO (add-in COM em .NET Framework 4.8, instalado por
-    cópia + chaves HKCU):
+    DOIS PERFIS DE PRE-REQUISITO (add-in COM em .NET Framework 4.8, instalado por
+    copia + chaves HKCU):
 
-      * ESSENCIAL PARA RODAR o add-in (máquina ALVO, usada por scripts\install.ps1):
+      * ESSENCIAL PARA RODAR o add-in (maquina ALVO, usada por scripts\install.ps1):
           - .NET Framework 4.8
-          - Excel (o add-in COM não carrega em nenhuma variante que não seja o
-            Excel desktop clássico)
-        Sem isto o add-in não carrega. Estes itens marcam falha global (exit 1).
+          - Excel (o add-in COM nao carrega em nenhuma variante que nao seja o
+            Excel desktop classico)
+        Sem isto o add-in nao carrega. Estes itens marcam falha global (exit 1).
 
-      * ESSENCIAL PARA BUILDAR o add-in (máquina de DESENVOLVIMENTO):
-          - .NET SDK ('dotnet'), Git, VS Code + extensão C#
-        São necessários para COMPILAR/manter o código, NÃO para rodar o artefato.
-        Por padrão também marcam falha global; com -RuntimeOnly o script verifica
-        apenas o perfil de RUNTIME (útil para checar a máquina alvo antes de instalar).
+      * ESSENCIAL PARA BUILDAR o add-in (maquina de DESENVOLVIMENTO):
+          - .NET SDK ('dotnet'), Git, VS Code + extensao C#
+        Sao necessarios para COMPILAR/manter o codigo, NAO para rodar o artefato.
+        Por padrao tambem marcam falha global; com -RuntimeOnly o script verifica
+        apenas o perfil de RUNTIME (util para checar a maquina alvo antes de instalar).
 
 .PARAMETER RuntimeOnly
     Verifica apenas os itens ESSENCIAIS PARA RODAR o add-in (.NET Framework 4.8 +
-    Excel). Itens de BUILD (SDK/Git/VS Code) viram informativos. Use na máquina
-    ALVO (onde o add-in será instalado), antes do install.ps1.
+    Excel). Itens de BUILD (SDK/Git/VS Code) viram informativos. Use na maquina
+    ALVO (onde o add-in sera instalado), antes do install.ps1.
 
 .NOTES
-    Compatível com Windows PowerShell 5.1+ e PowerShell 7+.
+    Compativel com Windows PowerShell 5.1+ e PowerShell 7+.
 #>
 
 [CmdletBinding()]
@@ -43,12 +43,12 @@ param(
 
 $ErrorActionPreference = 'Continue'
 
-# Quando -RuntimeOnly, itens de BUILD (SDK/Git/VS Code) NÃO marcam falha global:
-# tratamos a máquina como "alvo" (só precisa rodar o add-in, não compilá-lo).
+# Quando -RuntimeOnly, itens de BUILD (SDK/Git/VS Code) NAO marcam falha global:
+# tratamos a maquina como "alvo" (so precisa rodar o add-in, nao compila-lo).
 $script:BuildEssential = -not $RuntimeOnly
 
 # ---------------------------------------------------------------------------
-# Infraestrutura de relatório
+# Infraestrutura de relatorio
 # ---------------------------------------------------------------------------
 $script:HasError = $false   # vira $true se algum item ESSENCIAL faltar/falhar
 
@@ -74,7 +74,7 @@ function Write-Status {
 }
 
 function Test-PeMachine {
-    # Retorna 'x64', 'x86' ou uma string hex; lê o cabeçalho PE do executável.
+    # Retorna 'x64', 'x86' ou uma string hex; le o cabecalho PE do executavel.
     param([string]$Path)
     $fs = $null
     $br = $null
@@ -102,12 +102,12 @@ Write-Host ''
 Write-Host '=== verify-environment.ps1 ===' -ForegroundColor White
 Write-Host ('Executado em: {0}' -f (Get-Date)) -ForegroundColor DarkGray
 if ($RuntimeOnly) {
-    Write-Host 'Modo: RUNTIME-ONLY (máquina ALVO: só o necessário para RODAR o add-in)' -ForegroundColor DarkGray
+    Write-Host 'Modo: RUNTIME-ONLY (maquina ALVO: so o necessario para RODAR o add-in)' -ForegroundColor DarkGray
 } else {
-    Write-Host 'Modo: COMPLETO (BUILD + RUNTIME). Use -RuntimeOnly para checar só a máquina alvo.' -ForegroundColor DarkGray
+    Write-Host 'Modo: COMPLETO (BUILD + RUNTIME). Use -RuntimeOnly para checar so a maquina alvo.' -ForegroundColor DarkGray
 }
 Write-Host ''
-Write-Host '----- ESSENCIAL PARA RODAR (máquina alvo): .NET Framework 4.8 + Excel -----' -ForegroundColor White
+Write-Host '----- ESSENCIAL PARA RODAR (maquina alvo): .NET Framework 4.8 + Excel -----' -ForegroundColor White
 
 # ---------------------------------------------------------------------------
 # 1. Windows
@@ -116,7 +116,7 @@ try {
     $os = Get-CimInstance Win32_OperatingSystem -ErrorAction Stop
     Write-Status -Status OK -Message ("Windows: {0} (build {1}, {2})" -f $os.Caption.Trim(), $os.BuildNumber, $os.OSArchitecture)
 } catch {
-    Write-Status -Status FAIL -Message "Windows: não foi possível detectar a versão." -Essential
+    Write-Status -Status FAIL -Message "Windows: nao foi possivel detectar a versao." -Essential
 }
 
 # ---------------------------------------------------------------------------
@@ -132,10 +132,10 @@ if ($excelExe -and (Test-Path $excelExe)) {
     $arch = Test-PeMachine -Path $excelExe
     Write-Status -Status OK -Message ("Excel detectado: {0} ({1}) em {2}" -f $ver, $arch, $excelExe)
     if ($arch -ne 'x64') {
-        Write-Status -Status INFO -Message ("Excel parece ser {0} (baseline validado é x64 — ver FUT-01)." -f $arch)
+        Write-Status -Status INFO -Message ("Excel parece ser {0} (baseline validado e x64 - ver FUT-01)." -f $arch)
     }
 } else {
-    Write-Status -Status MISSING -Message "Excel (EXCEL.EXE) não encontrado." -Essential
+    Write-Status -Status MISSING -Message "Excel (EXCEL.EXE) nao encontrado." -Essential
 }
 
 # Bitness do Office (Click-to-Run)
@@ -146,18 +146,18 @@ if (Test-Path $c2r) {
     if ($plat) {
         Write-Status -Status OK -Message ("Office bitness: {0} -> o add-in deve ser {0} ou AnyCPU." -f $plat)
     } else {
-        Write-Status -Status INFO -Message "Office bitness: não reportado em ClickToRun\Configuration."
+        Write-Status -Status INFO -Message "Office bitness: nao reportado em ClickToRun\Configuration."
     }
 } else {
-    Write-Status -Status INFO -Message "Office ClickToRun\Configuration ausente (possível instalação MSI)."
+    Write-Status -Status INFO -Message "Office ClickToRun\Configuration ausente (possivel instalacao MSI)."
 }
 
 Write-Host ''
-Write-Host '----- ESSENCIAL PARA BUILDAR (máquina de desenvolvimento): .NET SDK, Git, VS Code -----' -ForegroundColor White
-Write-Host '       (com -RuntimeOnly estes itens viram informativos, não bloqueiam.)' -ForegroundColor DarkGray
+Write-Host '----- ESSENCIAL PARA BUILDAR (maquina de desenvolvimento): .NET SDK, Git, VS Code -----' -ForegroundColor White
+Write-Host '       (com -RuntimeOnly estes itens viram informativos, nao bloqueiam.)' -ForegroundColor DarkGray
 
 # ---------------------------------------------------------------------------
-# 3. .NET SDK (ESSENCIAL PARA BUILDAR via 'dotnet' - NÃO é necessário p/ rodar)
+# 3. .NET SDK (ESSENCIAL PARA BUILDAR via 'dotnet' - NAO e necessario p/ rodar)
 # ---------------------------------------------------------------------------
 $dotnetCmd = Get-Command dotnet -ErrorAction SilentlyContinue
 if ($dotnetCmd) {
@@ -166,15 +166,15 @@ if ($dotnetCmd) {
         $sdkList = ($sdks | ForEach-Object { ($_ -split ' ')[0] }) -join ', '
         Write-Status -Status OK -Message ("[BUILD] .NET SDK presente: {0} (dotnet em {1})" -f $sdkList, $dotnetCmd.Source)
     } else {
-        Write-Status -Status MISSING -Message "[BUILD] 'dotnet' encontrado, mas NENHUM SDK instalado (só runtimes). Build via CLI não funciona. Instale o .NET 8 SDK." -Essential:$script:BuildEssential
+        Write-Status -Status MISSING -Message "[BUILD] 'dotnet' encontrado, mas NENHUM SDK instalado (so runtimes). Build via CLI nao funciona. Instale o .NET 8 SDK." -Essential:$script:BuildEssential
     }
 } else {
     Write-Status -Status MISSING -Message "[BUILD] '.NET SDK' ausente. Instale: winget install --id Microsoft.DotNet.SDK.8 -e" -Essential:$script:BuildEssential
 }
 
 # ---------------------------------------------------------------------------
-# 4. .NET Framework 4.8 (ESSENCIAL PARA RODAR o add-in - máquina alvo)
-#    O add-in COM é net48; sem o .NET Framework 4.8 ele não carrega no Excel.
+# 4. .NET Framework 4.8 (ESSENCIAL PARA RODAR o add-in - maquina alvo)
+#    O add-in COM e net48; sem o .NET Framework 4.8 ele nao carrega no Excel.
 # ---------------------------------------------------------------------------
 $ndp = 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full'
 if (Test-Path $ndp) {
@@ -188,7 +188,7 @@ if (Test-Path $ndp) {
         Write-Status -Status MISSING -Message ("[RUNTIME] .NET Framework {0} (Release {1}) abaixo de 4.8. O add-in net48 exige 4.8+." -f $fxVer, $rel) -Essential
     }
 } else {
-    Write-Status -Status MISSING -Message "[RUNTIME] .NET Framework 4.8 NÃO detectado. O add-in net48 NÃO carregará sem ele." -Essential
+    Write-Status -Status MISSING -Message "[RUNTIME] .NET Framework 4.8 NAO detectado. O add-in net48 NAO carregara sem ele." -Essential
 }
 
 # ---------------------------------------------------------------------------
@@ -206,9 +206,9 @@ if ($msbuildCmd) {
     }
 }
 if ($msbuild) {
-    Write-Status -Status INFO -Message ("MSBuild disponível: {0} (não é usado pelo fluxo dotnet CLI deste projeto — ver CLAUDE.md)." -f $msbuild)
+    Write-Status -Status INFO -Message ("MSBuild disponivel: {0} (nao e usado pelo fluxo dotnet CLI deste projeto - ver CLAUDE.md)." -f $msbuild)
 } else {
-    Write-Status -Status INFO -Message "MSBuild (Build Tools) não encontrado. Não é necessário — este projeto usa 'dotnet build'."
+    Write-Status -Status INFO -Message "MSBuild (Build Tools) nao encontrado. Nao e necessario - este projeto usa 'dotnet build'."
 }
 
 # ---------------------------------------------------------------------------
@@ -222,7 +222,7 @@ if ($psv.Major -ge 5) {
 }
 $pwsh = Get-Command pwsh -ErrorAction SilentlyContinue
 if ($pwsh) {
-    Write-Status -Status INFO -Message ("PowerShell 7+ também presente: {0}" -f $pwsh.Version.ToString())
+    Write-Status -Status INFO -Message ("PowerShell 7+ tambem presente: {0}" -f $pwsh.Version.ToString())
 }
 
 # ---------------------------------------------------------------------------
@@ -236,7 +236,7 @@ if ($git) {
 }
 
 # ---------------------------------------------------------------------------
-# 8. VS Code + extensão C#
+# 8. VS Code + extensao C#
 # ---------------------------------------------------------------------------
 $code = Get-Command code -ErrorAction SilentlyContinue
 if ($code) {
@@ -244,22 +244,22 @@ if ($code) {
     $exts = & code --list-extensions 2>$null
     $hasCsharp = $exts -contains 'ms-dotnettools.csharp'
     if ($hasCsharp) {
-        Write-Status -Status OK -Message ("[BUILD] VS Code: {0} (extensão C# 'ms-dotnettools.csharp' instalada)" -f $cv)
+        Write-Status -Status OK -Message ("[BUILD] VS Code: {0} (extensao C# 'ms-dotnettools.csharp' instalada)" -f $cv)
     } else {
-        Write-Status -Status MISSING -Message ("[BUILD] VS Code {0} presente, mas SEM a extensão C#. Instale: code --install-extension ms-dotnettools.csharp" -f $cv) -Essential:$script:BuildEssential
+        Write-Status -Status MISSING -Message ("[BUILD] VS Code {0} presente, mas SEM a extensao C#. Instale: code --install-extension ms-dotnettools.csharp" -f $cv) -Essential:$script:BuildEssential
     }
 } else {
     Write-Status -Status MISSING -Message "[BUILD] VS Code ausente. Instale: winget install --id Microsoft.VisualStudioCode -e" -Essential:$script:BuildEssential
 }
 
 # ---------------------------------------------------------------------------
-# 9. winget (auxiliar de instalação)
+# 9. winget (auxiliar de instalacao)
 # ---------------------------------------------------------------------------
 $winget = Get-Command winget -ErrorAction SilentlyContinue
 if ($winget) {
-    Write-Status -Status INFO -Message ("winget disponível: {0}" -f ((& winget --version) -join ''))
+    Write-Status -Status INFO -Message ("winget disponivel: {0}" -f ((& winget --version) -join ''))
 } else {
-    Write-Status -Status INFO -Message "winget não encontrado (instalação manual de ferramentas pode ser necessária)."
+    Write-Status -Status INFO -Message "winget nao encontrado (instalacao manual de ferramentas pode ser necessaria)."
 }
 
 # ---------------------------------------------------------------------------
@@ -270,12 +270,12 @@ if ($script:HasError) {
     if ($RuntimeOnly) {
         Write-Host 'RESULTADO: faltam itens ESSENCIAIS PARA RODAR o add-in (.NET Framework 4.8 / Excel).' -ForegroundColor Red
     } else {
-        Write-Host 'RESULTADO: há itens ESSENCIAIS ausentes/falhos (ver [RUNTIME]/[BUILD] e [MISSING]/[FAIL] acima).' -ForegroundColor Red
+        Write-Host 'RESULTADO: ha itens ESSENCIAIS ausentes/falhos (ver [RUNTIME]/[BUILD] e [MISSING]/[FAIL] acima).' -ForegroundColor Red
     }
     exit 1
 } else {
     if ($RuntimeOnly) {
-        Write-Host 'RESULTADO: máquina APTA A RODAR o add-in (RUNTIME ok: .NET Framework 4.8 + Excel).' -ForegroundColor Green
+        Write-Host 'RESULTADO: maquina APTA A RODAR o add-in (RUNTIME ok: .NET Framework 4.8 + Excel).' -ForegroundColor Green
     } else {
         Write-Host 'RESULTADO: ambiente apto (RUNTIME para rodar + BUILD para compilar - todos essenciais OK).' -ForegroundColor Green
     }
