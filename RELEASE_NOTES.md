@@ -8,6 +8,45 @@ Releases do GitHub (editável de lá via `gh release edit`, não neste arquivo).
 
 ---
 
+## Finance Fmt Tools v2.1.1
+
+### Correção crítica: one-liner de instalação (`irm | iex`) quebrado desde a v2.0.0
+
+O comando de instalação/desinstalação documentado no README —
+
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercontent.com/tpougy/finance-fmt-tools/main/scripts/install.ps1 | iex
+```
+
+— falhava para todo usuário com um erro de parse do PowerShell (`Atributo 'CmdletBinding'
+inesperado`, `Token 'param' inesperado`), reportado por um usuário e reproduzido ao vivo via
+automação COM contra um Windows/Excel real.
+
+**Causa raiz**: `scripts/install.ps1` e `scripts/uninstall.ps1` carregavam um BOM UTF-8 no início
+do arquivo (adicionado deliberadamente para evitar corrupção de acentos portugueses ao rodar via
+`-File`). `Invoke-RestMethod` (`irm`) não remove esse BOM ao baixar o script como string, e o
+caractere sobrando na frente de `#Requires -Version 5.1` faz o parser do `Invoke-Expression`
+(`iex`) falhar ao reconhecer o bloco `[CmdletBinding()]`/`param(...)` logo em seguida.
+
+**Correção**: em vez de remendar o one-liner para remover o BOM manualmente antes de `iex`, os
+scripts (`install.ps1`, `uninstall.ps1`, `verify-environment.ps1`) foram reescritos inteiramente em
+ASCII — sem nenhum caractere acentuado ou BOM. ASCII puro é um subconjunto válido de qualquer
+codepage e do UTF-8, então não há mais ambiguidade de encoding para o PowerShell resolver: o
+one-liner documentado acima volta a funcionar exatamente como está, sem nenhuma mudança de comando.
+(Confirmado também que simplesmente remover o BOM do arquivo sem essa transliteração não seria
+seguro — um travessão dentro de uma mensagem corrompia de verdade o parser ao rodar via `-File` sob
+uma codepage legada, não apenas cosmeticamente.)
+
+Validado de ponta a ponta: build local + 40/40 testes passando, pacote com os 7 arquivos esperados,
+scripts confirmados sem BOM/ASCII puro, e o fluxo `irm | iex` simulado com o conteúdo real do
+arquivo publicado — zero erros de parse, execução chega corretamente até a lógica de negócio do
+instalador.
+
+Se você tentou instalar ou atualizar via o one-liner documentado em qualquer versão anterior
+(v2.0.0, v2.0.1, v2.1.0) e recebeu esse erro, rode o comando novamente agora — está corrigido.
+
+---
+
 ## Finance Fmt Tools v2.1.0
 
 ### Migração automática da versão VBA legada
