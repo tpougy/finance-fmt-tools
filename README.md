@@ -40,6 +40,8 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://raw.githubusercont
 
 ### Atualizando da versão VBA
 
+> A partir da v2.1.0, o instalador (`scripts/install.ps1`) detecta automaticamente uma instalação anterior da versão VBA (`FinanceFmtTools.xlam` em `%APPDATA%\Microsoft\AddIns`), desregistra-a do Excel via automação COM e remove o arquivo do disco — tudo isso antes de instalar a versão C#, sem nenhuma ação manual do usuário. Os passos abaixo permanecem documentados apenas como referência, caso a remoção automática não seja possível por algum motivo.
+
 Se você já tinha o add-in antigo (`.xlam`, VBA) instalado, remova-o **antes** de instalar esta versão,
 para evitar duas abas "Finance Fmt" simultâneas no ribbon:
 
