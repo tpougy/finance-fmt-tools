@@ -5,7 +5,7 @@ milestone_name: milestone
 status: Awaiting next milestone
 stopped_at: Completed 05-04-PLAN.md — Phase 5 fully code-complete (4/4 plans). Proceeding to Phase 5 code review + verification, then milestone lifecycle.
 last_updated: "2026-07-11T19:18:37.256Z"
-last_activity: 2026-07-12 - Released v2.1.0 (VBA auto-migration in installer, PadHyphen removal, race-condition fix)
+last_activity: 2026-07-13 - README.md reorganizado (instalação movida para o topo, nota sobre auto-migração VBA)
 progress:
   total_phases: 5
   completed_phases: 5
@@ -60,6 +60,7 @@ None currently open (all v1.0 blockers resolved or reclassified as Deferred Item
 | 260712-h44 | Remover token PadHyphen do formato contábil final (sobra apenas Open/CloseParenPad) | 2026-07-12 | caa55bf | [260712-h44-remover-padhyphen-do-formato-contabil-fi](./quick/260712-h44-remover-padhyphen-do-formato-contabil-fi/) |
 | 260712-hbu | Adicionar detecção e remoção automática de instalação VBA legada (.xlam) a scripts/install.ps1 | 2026-07-12 | e0db2a9 | [260712-hbu-adicionar-deteccao-e-remocao-de-instalac](./quick/260712-hbu-adicionar-deteccao-e-remocao-de-instalac/) |
 | 260712-hzj | Corrigir race condition (EXCEL.EXE ainda de pé) em Remove-LegacyVbaAddin, achada em teste ao vivo | 2026-07-12 | 528082f | [260712-hzj-corrigir-race-condition-no-remove-legacy](./quick/260712-hzj-corrigir-race-condition-no-remove-legacy/) |
+| 260713-jrg | Mover seção de instalação para o topo do README e documentar auto-migração VBA | 2026-07-13 | bec4451 | [260713-jrg-ajustar-readme-md-mover-a-se-o-de-instru](./quick/260713-jrg-ajustar-readme-md-mover-a-se-o-de-instru/) |
 
 ## Deferred Items
 
